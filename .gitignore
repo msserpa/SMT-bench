@@ -50,3 +50,14 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Ignore bin build and lib dirs
+bin/*
+build/*
+lib/*
+
+# keep for empty dirs
+!.keep
+
+# Mac OS files
+.DS_Store 
