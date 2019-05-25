@@ -11,6 +11,10 @@ This software is made available using the GNU General Public License v3.0 licens
 * PAPI: Performance Application Programming Interface
 
   Download at <http://icl.utk.edu/papi>
+  
+* Portable Hardware Locality (hwloc)
+
+  Download at <https://www.open-mpi.org/projects/hwloc/>  
 
 ---
 
