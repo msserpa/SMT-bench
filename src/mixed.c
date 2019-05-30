@@ -111,8 +111,13 @@ void parse_type_vector(const char *argv){
 	i = 0;
 	token = strtok(str, comma);
 	while(token != NULL){
-		if(isInt((token)))
+		if(isInt((token))){
 			memory[i - 1] = atoi(token);
+			if(memory[i - 1] < 1){
+				printf("The array length needs be at least 1024 %s\n", token);
+				exit(EXIT_FAILURE);				
+			}
+		}
 		else{
 			for(j = 0; j < NWORKLOADS; j++)
 				if(strcmp(token, workload_name[j]) == 0){
@@ -131,8 +136,9 @@ void parse_type_vector(const char *argv){
 
 	for(i = 0; i < nt; i++){
 		threads[i].typeA  = workload[i % n];
-		threads[i].memory = memory[i % n];
+		threads[i].memoryA = memory[i % n];
 		threads[i].typeB = workload[(i + 1) % n];
+		threads[i].memoryB = memory[(i + 1) % n];
 	}
 
 	free(workload);

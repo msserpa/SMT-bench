@@ -51,9 +51,10 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Ignore bin build and lib dirs
+# Ignore bin build exp and lib dirs
 bin/*
 build/*
+exp/*
 lib/*
 
 # keep for empty dirs

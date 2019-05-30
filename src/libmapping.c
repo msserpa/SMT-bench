@@ -189,15 +189,15 @@ void map_env(char *mapping){
 	map = (char *) calloc(BUFFER_SIZE, sizeof(char));
 
 	if(mapping[0] == 'h' && mapping[1] == 'e'){
-		strcpy(map, "HETERO");
+		strcpy(map, "hetero");
 		map_heterogeneous();
 	}
 	else if(mapping[0] == 'h' && mapping[1] == 'o'){
-		strcpy(map, "HOMO");
+		strcpy(map, "homo");
 		map_homogeneos();
 	}
 	else{
-		strcpy(map, "RAND");
+		strcpy(map, "rand");
 		map_random();
 	}
 	map = (char *) realloc(map, (strlen(map) + 1) * sizeof(char));

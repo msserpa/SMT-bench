@@ -19,7 +19,10 @@ int main(int argc, char **argv){
 	pthread_t *ts;
 
 	if(argc != 4){
-		printf("Usage: %s <h|s|p|v|u|f> <heterogeneous | homogeneos | random> <time>\n", argv[0]);
+		fprintf(stderr, "Usage: %s <workloads-comma-separed> <heterogeneous | homogeneos | random> <time>\n", argv[0]);
+		fprintf(stderr, "Workloads list:\n");
+		for(i = 0; i < NWORKLOADS; i++)
+			fprintf(stderr, "\t%s\n", workload_name[i]);
 		exit(EXIT_FAILURE);
 	}
 	ts = malloc((nt + 1) * sizeof(pthread_t));
@@ -80,7 +83,7 @@ int main(int argc, char **argv){
 
 	for(i = 0; i < NWORKLOADS; i++)
 		if(loops[i] != 0)
-			fprintf(stderr, "%s:%llu\n", workload_name[i], loops[i]);	
+			fprintf(stderr, "%s:%llu\n", workload_name[i], loops[i]);
 
 	map_terminate();
 

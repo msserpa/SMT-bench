@@ -879,11 +879,11 @@ void execution_int_mul_ind(thread_data_t *t){
 
 void alloc_list(thread_data_t *t){
 
-	uint64_t i, length = t->memory * 1024 / sizeof(list_t);
+	uint64_t i, length = t->memoryA * 1024 / sizeof(list_t);
 	list_t *ptr_this;
 
 	if(length == 0 || length % 32 != 0){
-		fprintf(stderr, "The array length needs to be divisible by 32.\n");
+		fprintf(stderr, "The array size (%lu) needs to be divisible by 32.\n", length);
 		exit(EXIT_FAILURE);
 	}
 
@@ -891,16 +891,18 @@ void alloc_list(thread_data_t *t){
 	assert(t->ptr_list != NULL);
 
     ptr_this = t->ptr_list;
-	for(i = 0; i < length; i++){
+	for(i = 0; i < length - 1; i++){
 		ptr_this->v = 1;
 		ptr_this->next = &t->ptr_list[i+1];
 		ptr_this = ptr_this->next;
 		ptr_this->next = NULL;
 	}
+	ptr_this->v = 1;
+	ptr_this->next = &t->ptr_list[0];
 }
 
 void memory_load_dep(thread_data_t *t){
-	uint64_t i = 0, j = 0, print = 0, length = t->memory * 1024 / sizeof(list_t);
+	uint64_t i = 0, j = 0, print = 0, length = t->memoryA * 1024 / sizeof(list_t);
 	list_t *ptr_this;
 
 	do{
@@ -953,10 +955,10 @@ void memory_load_dep(thread_data_t *t){
 
 void alloc_vec(thread_data_t *t){
 
-	uint64_t i, length = t->memory * 1024 / sizeof(vec_t);
+	uint64_t i, length = t->memoryA * 1024 / sizeof(vec_t);
 
 	if(length == 0 || length % 32 != 0){
-		fprintf(stderr, "The array size needs to be divisible by 32.\n");
+		fprintf(stderr, "The array size (%lu) needs to be divisible by 32.\n", length);
 		exit(EXIT_FAILURE);
 	}
 
@@ -968,14 +970,14 @@ void alloc_vec(thread_data_t *t){
 }
 
 void init_vec(thread_data_t *t){
-	uint64_t i, length = t->memory * 1024 / sizeof(vec_t);
+	uint64_t i, length = t->memoryA * 1024 / sizeof(vec_t);
 	
 	for(i = 0; i < length; i++)
 		t->ptr_vec[i].v = i;
 }
 
 void memory_load_ind(thread_data_t *t){
-	uint64_t i = 0, j, jump = 0, count = 0, length = t->memory * 1024 / sizeof(vec_t);
+	uint64_t i = 0, j, jump = 0, count = 0, length = t->memoryA * 1024 / sizeof(vec_t);
 
 	do{
 		for(j = 0; j <= length - 32; j += 32){
@@ -1023,12 +1025,12 @@ void memory_load_ind(thread_data_t *t){
 }
 
 void memory_load_random(thread_data_t *t){
-	uint64_t i = 0, j, jump = 1, print = 0, count[32], length = t->memory * 1024 / sizeof(vec_t);
+	uint64_t i = 0, j, jump = 1, print = 0, count[32], length = t->memoryA * 1024 / sizeof(vec_t);
 	unsigned bit;
 	unsigned int lfsr = 0x80000000;
 
-	for(i = 0; i < 32; i++)
-		count[i] = 0;
+	for(j = 0; j < 32; j++)
+		count[j] = 0;
     
 	do{
 		for(j = 0; j <= length - 32; j += 32){
@@ -1076,15 +1078,15 @@ void memory_load_random(thread_data_t *t){
 		i += j;
 	}while(alive);
 
-    for(i = 0; i < 8; i++)
-        print += count[i];
+    for(j = 0; j < 8; j++)
+        print += count[j];
 
 	t->v2 = print;
 	t->loops = i;
 }
 
 void memory_store_ind(thread_data_t *t){
-	uint64_t i = 0, j, jump = 0, print = 0,length = t->memory * 1024 / sizeof(vec_t);
+	uint64_t i = 0, j, jump = 0, print = 0,length = t->memoryA * 1024 / sizeof(vec_t);
 
 	do{
 		for(j = 0; j <= length - 32; j += 32){
@@ -1133,7 +1135,7 @@ void memory_store_ind(thread_data_t *t){
 }
 
 void memory_store_random(thread_data_t *t){
-	uint64_t i = 0, j, jump = 1, print = 0, length = t->memory * 1024 / sizeof(vec_t);
+	uint64_t i = 0, j, jump = 1, print = 0, length = t->memoryA * 1024 / sizeof(vec_t);
 	unsigned bit;
 	unsigned int lfsr = 0x80000000;
 

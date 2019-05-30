@@ -80,7 +80,7 @@
 		// double *A, *B, *C;
 		list_t *ptr_list;
 		vec_t *ptr_vec;
-		uint64_t memory;
+		uint64_t memoryA, memoryB; // in KB
 	}  __attribute__ ((aligned (CACHE_LINE_SIZE))) thread_data_t;
 
 	void (*work[NWORKLOADS]) (thread_data_t *t);
