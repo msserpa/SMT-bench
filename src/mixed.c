@@ -59,6 +59,7 @@ void libmapping_set_aff_thread(pid_t pid, uint64_t cpu){
 void *pthreads_callback (void *data){
 	thread_data_t *t = (thread_data_t*)data;
 	t->tid = syscall(__NR_gettid);
+	
 	libmapping_set_aff_thread(t->tid, t->cpu);
 	
 	if(papi_enabled)	
@@ -131,7 +132,7 @@ void parse_type_vector(const char *argv){
 		}
 		token = strtok(NULL, comma);
 	}
-
+	free(str);
 	assert(i == n);
 
 	for(i = 0; i < nt; i++){

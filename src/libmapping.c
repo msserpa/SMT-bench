@@ -17,7 +17,8 @@ void error_handler(const char *call, const int line){
 }
 
 void map_init(){
-	char *command = "hwloc-ls --no-caches --no-io -p > /tmp/hwloc; sleep 1";
+	char *command = "lstopo-no-graphics --no-caches --no-io -p > /tmp/hwloc; sleep 1";
+	
 
 	if(system(command) != 0)
 		error_handler("hwloc-ls not found!", __LINE__);
@@ -179,12 +180,34 @@ void map_random(){
 	free(app_aux);
 }
 
+void thread_init(){
+	uint32_t i;
+
+	threads = (thread_data_t *) malloc(nt * sizeof(thread_data_t));
+	assert(threads != NULL);
+	
+	for(i = 0; i < nt; i++){
+		threads[i].typeA = WORKLOAD_IDLE;
+		threads[i].typeB = WORKLOAD_IDLE;
+		threads[i].cpu = -1;
+		threads[i].loops = 0;
+		threads[i].tid = -1;
+		threads[i].event = NULL;
+		threads[i].EventSet1 = 0;
+		threads[i].value[0] = 0;
+		threads[i].value[1] = 0;
+		threads[i].v2 = 0;
+		threads[i].ptr_list = NULL;
+		threads[i].ptr_vec = NULL;
+		threads[i].memoryA = 0;
+		threads[i].memoryB = 0;
+	}	
+}
+
 void map_env(char *mapping){
 	map_init();
 	map_threads();
-	
-	threads = (thread_data_t *) malloc(nt * sizeof(thread_data_t));
-	assert(threads != NULL);
+	thread_init();	
 
 	map = (char *) calloc(BUFFER_SIZE, sizeof(char));
 

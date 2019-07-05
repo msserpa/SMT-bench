@@ -68,12 +68,12 @@
 		workload_t typeA, typeB;
 		uint32_t cpu;
 		uint64_t loops;
+		double time;
 		pid_t tid;
 
 		char *event;
 		int EventSet1;
 		long long value[2];
-		uint64_t overflows;
 
 		uint64_t v2;
 		// uint64_t *buffer;
@@ -103,8 +103,10 @@
 	void execution_int_div_ind(thread_data_t *t);
 	void execution_int_mul_ind(thread_data_t *t);
 	void alloc_list(thread_data_t *t);
+	void free_list(thread_data_t *t);
 	void memory_load_dep(thread_data_t *t);
 	void alloc_vec(thread_data_t *t);
+	void free_vec(thread_data_t *t);
 	void init_vec(thread_data_t *t);
 	void memory_load_ind(thread_data_t *t);
 	void memory_load_random(thread_data_t *t);

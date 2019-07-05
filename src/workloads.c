@@ -901,6 +901,10 @@ void alloc_list(thread_data_t *t){
 	ptr_this->next = &t->ptr_list[0];
 }
 
+void free_list(thread_data_t *t){
+	free(t->ptr_list);
+}
+
 void memory_load_dep(thread_data_t *t){
 	uint64_t i = 0, j = 0, print = 0, length = t->memoryA * 1024 / sizeof(list_t);
 	list_t *ptr_this;
@@ -967,6 +971,10 @@ void alloc_vec(thread_data_t *t){
 
 	for(i = 0; i < length; i++)
         t->ptr_vec[i].v = 1;
+}
+
+void free_vec(thread_data_t *t){
+	free(t->ptr_vec);
 }
 
 void init_vec(thread_data_t *t){
@@ -1078,8 +1086,8 @@ void memory_load_random(thread_data_t *t){
 		i += j;
 	}while(alive);
 
-    for(j = 0; j < 8; j++)
-        print += count[j];
+	for(j = 0; j < 8; j++)
+		print += count[j];
 
 	t->v2 = print;
 	t->loops = i;

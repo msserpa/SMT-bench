@@ -1,13 +1,13 @@
 SHELL=/bin/bash
-CC := icc
+CC := gcc
 HOST := $(shell hostname)
 TARGET := bin/mixed.$(HOST)
 
 SOURCES := $(shell find src -type f -name *.c)
 OBJECTS := $(patsubst src/%,build/%,$(SOURCES:.c=.$(HOST).o))
-CFLAGS := -O0  -Wmissing-declarations	 -Wunused-variable	 -Wpointer-arith -Wuninitialized -Wdeprecated -Wabi -Wunused-function -Wunknown-pragmas -Wmain -Wcomments -Wreturn-type   -Wall -Wextra -Werror 
+CFLAGS := -O0 -Wall -Wextra
 #-xHost -qopt-report=5
-LDFLAGS := -lpthread -L$(HOME)/papi/lib/ -lpapi -lm
+LDFLAGS := -lpthread -L/usr/local/lib/ -lpapi -lm
 INC := -I$(HOME)/papi/include/
 
 $(TARGET): $(OBJECTS)

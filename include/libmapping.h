@@ -5,6 +5,8 @@
 
 	void error_handler(const char *call, const int line);
 
+	void thread_init();
+
 	void map_init();
 
 	void map_terminate();
