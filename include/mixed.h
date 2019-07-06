@@ -13,6 +13,6 @@
 	void *pthreads_callback(void *data);
 	void *time_monitor(void *walltime);
 	int isInt(char *str);
-	void parse_type_vector(const char *argv);
+	void parse_type_vector(const char *argv, char class);
 
 #endif

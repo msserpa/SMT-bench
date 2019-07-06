@@ -1,0 +1,28 @@
+ gcc -O0 -Wall -Wextra -I/home/users/msserpa/papi/include/ -c -o build/mypapi.tupi2.o src/mypapi.c
+ gcc -O0 -Wall -Wextra -I/home/users/msserpa/papi/include/ -c -o build/libmapping.tupi2.o src/libmapping.c
+In file included from src/../include/mixed.h:10:0,
+                 from src/libmapping.c:8:
+src/../include/workloads.h:6:15: warning: ‘workload_name’ defined but not used [-Wunused-variable]
+  static char *workload_name[] = {
+               ^~~~~~~~~~~~~
+ gcc -O0 -Wall -Wextra -I/home/users/msserpa/papi/include/ -c -o build/mixed.tupi2.o src/mixed.c
+src/mixed.c: In function ‘pthreads_callback’:
+src/mixed.c:68:6: error: ‘os_enabled’ undeclared (first use in this function); did you mean ‘papi_enabled’?
+  if(!os_enabled)
+      ^~~~~~~~~~
+      papi_enabled
+src/mixed.c:68:6: note: each undeclared identifier is reported only once for each function it appears in
+src/mixed.c: At top level:
+src/mixed.c:95:6: error: conflicting types for ‘parse_type_vector’
+ void parse_type_vector(const char *argv, char class){
+      ^~~~~~~~~~~~~~~~~
+In file included from src/mixed.c:16:0:
+src/../include/mixed.h:16:7: note: previous declaration of ‘parse_type_vector’ was here
+  void parse_type_vector(const char *argv);
+       ^~~~~~~~~~~~~~~~~
+src/mixed.c: In function ‘parse_type_vector’:
+src/mixed.c:149:2: warning: implicit declaration of function ‘set_workload_iterations’ [-Wimplicit-function-declaration]
+  set_workload_iterations(class);
+  ^~~~~~~~~~~~~~~~~~~~~~~
+Makefile:18: recipe for target 'build/mixed.tupi2.o' failed
+make: *** [build/mixed.tupi2.o] Error 1

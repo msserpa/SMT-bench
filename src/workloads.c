@@ -4,7 +4,132 @@
 #include "../include/mixed.h"
 #include "../include/workloads.h"
 
-extern int alive;
+extern thread_data_t *threads;
+extern uint32_t nt;
+uint64_t iterations[NWORKLOADS];
+
+void init_class(){
+	uint64_t i = 0;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+	iterations[i++] = 1E8;
+}
+
+void init_class_A(){
+	uint64_t i = 0;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+	iterations[i++] = 2;
+}
+
+void init_class_B(){
+	uint64_t i = 0;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+	iterations[i++] = 3;
+}
+
+void init_class_C(){
+	uint64_t i = 0;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+	iterations[i++] = 4;
+}
+
+void set_workload_iterations(char class){
+	uint64_t i;
+	if(class == 'A')
+		init_class_A();
+	else if(class == 'B')
+		init_class_B();
+	else if(class == 'C')
+		init_class_C();
+	else
+		init_class();
+
+	for(i = 0; i < nt; i++)
+		threads[i].iterations = iterations[threads[i].typeA];
+}
 
 void init_workload(){
 	uint64_t i = 0;
@@ -67,10 +192,9 @@ void control_complex(thread_data_t *t){
 			}
 		}
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = k;
-	t->loops = i;
 }
 
 void control_conditional(thread_data_t *t){
@@ -85,10 +209,9 @@ void control_conditional(thread_data_t *t){
 			print -= i;
 		}
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = print;
-	t->loops = i;
 }
 
 void control_random(thread_data_t *t){
@@ -129,10 +252,9 @@ void control_random(thread_data_t *t){
 			asm volatile("mov %0, %0" : "=r" (lfsr) : "r" (lfsr) : );								
 
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = bit;
-	t->loops = i;
 }
 
 void control_small_bbl(thread_data_t *t){
@@ -143,13 +265,12 @@ void control_small_bbl(thread_data_t *t){
 
 	do{
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 	
 	for(j = 0; j < 64; j++)
 		print += count[j];
 
 	t->v2 = print;
-	t->loops = i;
 }
 
 void control_switch(thread_data_t *t){
@@ -223,10 +344,9 @@ void control_switch(thread_data_t *t){
 				exit(EXIT_FAILURE);
 		}
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = print;
-	t->loops = i;
 }
 
 void dependency_chain1(thread_data_t *t){
@@ -269,10 +389,9 @@ void dependency_chain1(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count0) : "0" (count0) : );
 		asm volatile("add %0, %0" : "=r" (count0) : "0" (count0) : );
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = count0;
-	t->loops = i;
 }
 
 void dependency_chain2(thread_data_t *t){
@@ -315,10 +434,9 @@ void dependency_chain2(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count0) : "0" (count0) : );
 		asm volatile("add %0, %0" : "=r" (count1) : "0" (count1) : );
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = count1;
-	t->loops = i;
 }
 
 
@@ -366,10 +484,9 @@ void dependency_chain3(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count1) : "0" (count1) : );
 		asm volatile("add %0, %0" : "=r" (count2) : "0" (count2) : );
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = count2;
-	t->loops = i;
 }
 
 void dependency_chain4(thread_data_t *t){
@@ -416,10 +533,9 @@ void dependency_chain4(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count2) : "0" (count2) : );
 		asm volatile("add %0, %0" : "=r" (count3) : "0" (count3) : );
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = count3;
-	t->loops = i;
 }
 
 void dependency_chain5(thread_data_t *t){
@@ -462,10 +578,9 @@ void dependency_chain5(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count3) : "0" (count3) : );
 		asm volatile("add %0, %0" : "=r" (count4) : "0" (count4) : );
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = count4;
-	t->loops = i;
 }
 
 void dependency_chain6(thread_data_t *t){
@@ -507,10 +622,9 @@ void dependency_chain6(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count4) : "0" (count4) : );
 		asm volatile("add %0, %0" : "=r" (count5) : "0" (count5) : );
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = count5;
-	t->loops = i;
 }
 
 void execution_fp_add_ind(thread_data_t *t){
@@ -576,7 +690,7 @@ void execution_fp_add_ind(thread_data_t *t){
 		asm volatile("addsd %%xmm6, %%xmm6" : : : "xmm6");
 		asm volatile("addsd %%xmm7, %%xmm7" : : : "xmm7");
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
     asm volatile("push $0x0":::);
     asm volatile("movsd %%xmm0, (%%rsp)" : : : );
@@ -584,7 +698,6 @@ void execution_fp_add_ind(thread_data_t *t){
     asm volatile("pop %%rbx" : : : "rbx");	
 
 	t->v2 = count;
-	t->loops = i;
 }
 
 void execution_fp_div_ind(thread_data_t *t){
@@ -649,7 +762,7 @@ void execution_fp_div_ind(thread_data_t *t){
 		asm volatile("divsd %%xmm6, %%xmm6" : : : "xmm6");
 		asm volatile("divsd %%xmm7, %%xmm7" : : : "xmm7");
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
     asm volatile("push $0x0":::);
     asm volatile("movsd %%xmm0, (%%rsp)" : : : );
@@ -657,7 +770,6 @@ void execution_fp_div_ind(thread_data_t *t){
     asm volatile("pop %%rbx" : : : "rbx");
 
 	t->v2 = count;
-	t->loops = i;
 }
 
 void execution_fp_mul_ind(thread_data_t *t){
@@ -723,7 +835,7 @@ void execution_fp_mul_ind(thread_data_t *t){
 		asm volatile("mulsd %%xmm6, %%xmm6" : : : "xmm6");
 		asm volatile("mulsd %%xmm7, %%xmm7" : : : "xmm7");
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
     asm volatile("push $0x0":::);
     asm volatile("movsd %%xmm0, (%%rsp)" : : : );
@@ -731,7 +843,6 @@ void execution_fp_mul_ind(thread_data_t *t){
     asm volatile("pop %%rbx" : : : "rbx");
 
 	t->v2 = count;
-	t->loops = i;
 }
 
 void execution_int_add_ind(thread_data_t *t){
@@ -774,10 +885,9 @@ void execution_int_add_ind(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count6) : "0" (count6) : );
 		asm volatile("add %0, %0" : "=r" (count7) : "0" (count7) : );
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = count7;
-	t->loops = i;
 }
 
 void execution_int_div_ind(thread_data_t *t){
@@ -824,11 +934,10 @@ void execution_int_div_ind(thread_data_t *t){
 		asm volatile("idiv %%rbx" : : : "rax", "rdx", "rbx" );
 		asm volatile("idiv %%rbx" : : : "rax", "rdx", "rbx" );
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 	asm volatile("mov %%rbx, %0" : "=r"(count) : : "rbx");
 
 	t->v2 = count;
-	t->loops = i;
 }
 
 void execution_int_mul_ind(thread_data_t *t){
@@ -871,10 +980,9 @@ void execution_int_mul_ind(thread_data_t *t){
 		asm volatile("imul %0, %0" : "=r" (count6) : "0" (count6) : );
 		asm volatile("imul %0, %0" : "=r" (count7) : "0" (count7) : );
 		i++;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = count7;
-	t->loops = i;
 }
 
 void alloc_list(thread_data_t *t){
@@ -951,10 +1059,9 @@ void memory_load_dep(thread_data_t *t){
 			print = ptr_this->v;
 		}
 		i += j;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = print;
-	t->loops = i;
 }
 
 void alloc_vec(thread_data_t *t){
@@ -1026,10 +1133,9 @@ void memory_load_ind(thread_data_t *t){
 			count += t->ptr_vec[jump + 31].v;			
 		}
 		i += j;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = count;
-	t->loops = i;
 }
 
 void memory_load_random(thread_data_t *t){
@@ -1084,13 +1190,12 @@ void memory_load_random(thread_data_t *t){
 			count[31] += t->ptr_vec[jump + 31].v;
 		}
 		i += j;
-	}while(alive);
+	}while(i < t->iterations);
 
 	for(j = 0; j < 8; j++)
 		print += count[j];
 
 	t->v2 = print;
-	t->loops = i;
 }
 
 void memory_store_ind(thread_data_t *t){
@@ -1136,10 +1241,9 @@ void memory_store_ind(thread_data_t *t){
 		}
 		print += t->ptr_vec[0].v;
 		i += j;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = print;
-	t->loops = i;
 }
 
 void memory_store_random(thread_data_t *t){
@@ -1193,10 +1297,9 @@ void memory_store_random(thread_data_t *t){
 		}
 		print += t->ptr_vec[0].v;
 		i += j;
-	}while(alive);
+	}while(i < t->iterations);
 
 	t->v2 = jump;
-	t->loops = i;
 }
 
 void workload_idle(thread_data_t *t){
@@ -1209,7 +1312,5 @@ void workload_idle(thread_data_t *t){
 		__asm__ __volatile__ ("pause");
 		__asm__ __volatile__ ("pause");
 		i++;
-	}while(alive);
-
-	t->loops = i;
+	}while(i < t->iterations);
 }

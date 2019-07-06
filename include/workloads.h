@@ -67,7 +67,7 @@
 	typedef struct thread_data_t{
 		workload_t typeA, typeB;
 		uint32_t cpu;
-		uint64_t loops;
+		uint64_t iterations;
 		double time;
 		pid_t tid;
 

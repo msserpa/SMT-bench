@@ -8,6 +8,7 @@
 #include "../include/mixed.h"
 
 extern thread_data_t *threads;
+extern uint32_t os_enabled;
 extern uint32_t nt;
 char *map, *env_omp, *env_mapping;
 
@@ -18,8 +19,6 @@ void error_handler(const char *call, const int line){
 
 void map_init(){
 	char *command = "lstopo-no-graphics --no-caches --no-io -p > /tmp/hwloc; sleep 1";
-	
-
 	if(system(command) != 0)
 		error_handler("hwloc-ls not found!", __LINE__);
 }
@@ -28,7 +27,8 @@ void map_terminate(){
 	free(threads);
 	free(map);
 	free(env_omp);
-	free(env_mapping);
+	if(!os_enabled)
+		free(env_mapping);
 }
 
 void map_threads(){
@@ -190,7 +190,8 @@ void thread_init(){
 		threads[i].typeA = WORKLOAD_IDLE;
 		threads[i].typeB = WORKLOAD_IDLE;
 		threads[i].cpu = -1;
-		threads[i].loops = 0;
+		threads[i].iterations = 0;
+		threads[i].time = 0.0;
 		threads[i].tid = -1;
 		threads[i].event = NULL;
 		threads[i].EventSet1 = 0;
@@ -214,12 +215,13 @@ void map_env(char *mapping){
 	if(mapping[0] == 'h' && mapping[1] == 'e'){
 		strcpy(map, "hetero");
 		map_heterogeneous();
-	}
-	else if(mapping[0] == 'h' && mapping[1] == 'o'){
+	}else if(mapping[0] == 'h' && mapping[1] == 'o'){
 		strcpy(map, "homo");
 		map_homogeneos();
-	}
-	else{
+	}else if(mapping[0] == 'o' && mapping[1] == 's'){
+		strcpy(map, "os");
+		os_enabled = 1;
+	}else{
 		strcpy(map, "rand");
 		map_random();
 	}

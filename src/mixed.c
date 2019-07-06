@@ -17,10 +17,10 @@
 #include "../include/mypapi.h"
 #include "../include/workloads.h"
 
-volatile int alive = 1;
 thread_data_t *threads = NULL;
 uint32_t nt = 0;
 extern uint32_t papi_enabled;
+extern uint32_t os_enabled;
 
 void libmapping_set_aff_thread(pid_t pid, uint64_t cpu){
 	#if defined(linux) || defined (__linux)
@@ -56,26 +56,32 @@ void libmapping_set_aff_thread(pid_t pid, uint64_t cpu){
 	#endif
 }
 
+double get_time(){
+   struct timespec tp;
+   clock_gettime(CLOCK_MONOTONIC, &tp);
+   return (double) tp.tv_sec + (double) tp.tv_nsec / 10E9;
+}
+
 void *pthreads_callback (void *data){
-	thread_data_t *t = (thread_data_t*)data;
+	thread_data_t *t = (thread_data_t*) data;
 	t->tid = syscall(__NR_gettid);
 	
-	libmapping_set_aff_thread(t->tid, t->cpu);
+	if(!os_enabled)
+		libmapping_set_aff_thread(t->tid, t->cpu);
 	
-	if(papi_enabled)	
+	if(papi_enabled)
 		papi_thread_init(t);
+
+	double start = get_time();
 
 	(*work[t->typeA]) (t);
 	
+	double end = get_time();
+	t->time = end - start;
+
 	if(papi_enabled)
 		papi_thread_finish(t);
 
-	pthread_exit(NULL);
-}
-
-void *time_monitor(void *walltime){
-	usleep((uint64_t) walltime * 1000000);
-	alive = 0;
 	pthread_exit(NULL);
 }
 
@@ -87,7 +93,7 @@ int isInt(char *str){
 	return 1;
 }
 
-void parse_type_vector(const char *argv){
+void parse_type_vector(const char *argv, char class){
 	uint64_t *memory, i, j, n, size = strlen(argv);
 	char *str, *token;
 	workload_t *workload;
@@ -141,6 +147,7 @@ void parse_type_vector(const char *argv){
 		threads[i].typeB = workload[(i + 1) % n];
 		threads[i].memoryB = memory[(i + 1) % n];
 	}
+	set_workload_iterations(class);
 
 	free(workload);
 	free(memory);
