@@ -56,6 +56,8 @@ bin/*
 build/*
 exp/*
 lib/*
+!exp/*.sh
+!exp/*.batch
 
 # keep for empty dirs
 !.keep
