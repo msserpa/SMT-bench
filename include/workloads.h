@@ -2,7 +2,9 @@
 	#define WORKLOADS_H
 	#define CACHE_LINE_SIZE 128
 	#define NWORKLOADS 23
-
+	
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wunused-variable"
 	static char *workload_name[] = {
 		"ctl-complex",
 		"ctl-conditional",
@@ -28,6 +30,7 @@
 		"store-rand",
 		"idle"
 	};
+	#pragma GCC diagnostic pop
 
 	typedef enum workload_t{
 		CONTROL_COMPLEX,
@@ -76,14 +79,17 @@
 		long long value[2];
 
 		uint64_t v2;
-		// uint64_t *buffer;
-		// double *A, *B, *C;
 		list_t *ptr_list;
 		vec_t *ptr_vec;
 		uint64_t memoryA, memoryB; // in KB
 	}  __attribute__ ((aligned (CACHE_LINE_SIZE))) thread_data_t;
 
 	void (*work[NWORKLOADS]) (thread_data_t *t);
+	void init_class();
+	void init_class_A();
+	void init_class_B();
+	void init_class_C();
+	void set_workload_iterations(char class);
 	void init_workload();
 	void control_complex(thread_data_t *t);
 	void control_conditional(thread_data_t *t);

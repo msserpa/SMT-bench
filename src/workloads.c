@@ -1,123 +1,368 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "../include/mixed.h"
 #include "../include/workloads.h"
 
 extern thread_data_t *threads;
 extern uint32_t nt;
-uint64_t iterations[NWORKLOADS];
+uint64_t **iterations;
 
 void init_class(){
-	uint64_t i = 0;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
-	iterations[i++] = 1E8;
+	iterations[CONTROL_COMPLEX][0] = 189179908;
+	iterations[CONTROL_CONDITIONAL][0] = 191351588;
+	iterations[CONTROL_RANDOM][0] = 11553348;
+	iterations[CONTROL_SMALL_BBL][0] = 300008838;
+	iterations[CONTROL_SWITCH][0] = 196536158;
+	iterations[DEPENDENCY_CHAIN1][0] = 8124306;
+	iterations[DEPENDENCY_CHAIN2][0] = 14099114;
+	iterations[DEPENDENCY_CHAIN3][0] = 19162794;
+	iterations[DEPENDENCY_CHAIN4][0] = 20886462;
+	iterations[DEPENDENCY_CHAIN5][0] = 24190991;
+	iterations[DEPENDENCY_CHAIN6][0] = 25964115;
+	iterations[EXECUTION_FP_ADD_IND][0] = 35627936;
+	iterations[EXECUTION_FP_DIV_IND][0] = 8589355;
+	iterations[EXECUTION_FP_MUL_IND][0] = 70229103;
+	iterations[EXECUTION_INT_ADD_IND][0] = 26421975;
+	iterations[EXECUTION_INT_DIV_IND][0] = 1633990;
+	iterations[EXECUTION_INT_MUL_IND][0] = 25259201;
+	iterations[MEMORY_LOAD_DEP][0] = 199582297; //16KB
+	iterations[MEMORY_LOAD_DEP][1] = 109563695; //32KB
+	iterations[MEMORY_LOAD_DEP][2] = 105747524; //64KB
+	iterations[MEMORY_LOAD_DEP][3] = 110968029; //128KB
+	iterations[MEMORY_LOAD_DEP][4] = 102500420; //256KB
+	iterations[MEMORY_LOAD_DEP][5] = 102342997; //512KB
+	iterations[MEMORY_LOAD_DEP][6] = 94549196; //1024KB
+	iterations[MEMORY_LOAD_DEP][7] = 92460646; //2048KB
+	iterations[MEMORY_LOAD_DEP][8] = 25996492; //4096KB
+	iterations[MEMORY_LOAD_DEP][9] = 11185903; //8192KB
+	iterations[MEMORY_LOAD_DEP][10] = 13638041; //16384KB
+	iterations[MEMORY_LOAD_DEP][11] = 15492710; //32768KB
+	iterations[MEMORY_LOAD_DEP][12] = 18638438; //65536KB
+	iterations[MEMORY_LOAD_IND][0] = 258822504; //16KB
+	iterations[MEMORY_LOAD_IND][1] = 259300475; //32KB
+	iterations[MEMORY_LOAD_IND][2] = 259668454; //64KB
+	iterations[MEMORY_LOAD_IND][3] = 260007492; //128KB
+	iterations[MEMORY_LOAD_IND][4] = 255701333; //256KB
+	iterations[MEMORY_LOAD_IND][5] = 259870720; //512KB
+	iterations[MEMORY_LOAD_IND][6] = 259917004; //1024KB
+	iterations[MEMORY_LOAD_IND][7] = 259887476; //2048KB
+	iterations[MEMORY_LOAD_IND][8] = 259763851; //4096KB
+	iterations[MEMORY_LOAD_IND][9] = 260073062; //8192KB
+	iterations[MEMORY_LOAD_IND][10] = 260068296; //16384KB
+	iterations[MEMORY_LOAD_IND][11] = 259341442; //32768KB
+	iterations[MEMORY_LOAD_IND][12] = 259980120; //65536KB
+	iterations[MEMORY_LOAD_RANDOM][0] = 314542049; //16KB
+	iterations[MEMORY_LOAD_RANDOM][1] = 287490899; //32KB
+	iterations[MEMORY_LOAD_RANDOM][2] = 272119873; //64KB
+	iterations[MEMORY_LOAD_RANDOM][3] = 248159436; //128KB
+	iterations[MEMORY_LOAD_RANDOM][4] = 199954767; //256KB
+	iterations[MEMORY_LOAD_RANDOM][5] = 170201907; //512KB
+	iterations[MEMORY_LOAD_RANDOM][6] = 148381398; //1024KB
+	iterations[MEMORY_LOAD_RANDOM][7] = 31831431; //2048KB
+	iterations[MEMORY_LOAD_RANDOM][8] = 13847161; //4096KB
+	iterations[MEMORY_LOAD_RANDOM][9] = 13136989; //8192KB
+	iterations[MEMORY_LOAD_RANDOM][10] = 15311592; //16384KB
+	iterations[MEMORY_LOAD_RANDOM][11] = 17010762; //32768KB
+	iterations[MEMORY_LOAD_RANDOM][12] = 20952455; //65536KB
+	iterations[MEMORY_STORE_IND][0] = 497871029; //16KB
+	iterations[MEMORY_STORE_IND][1] = 503788516; //32KB
+	iterations[MEMORY_STORE_IND][2] = 504519596; //64KB
+	iterations[MEMORY_STORE_IND][3] = 504500782; //128KB
+	iterations[MEMORY_STORE_IND][4] = 504138510; //256KB
+	iterations[MEMORY_STORE_IND][5] = 501652014; //512KB
+	iterations[MEMORY_STORE_IND][6] = 500944374; //1024KB
+	iterations[MEMORY_STORE_IND][7] = 498462049; //2048KB
+	iterations[MEMORY_STORE_IND][8] = 497411686; //4096KB
+	iterations[MEMORY_STORE_IND][9] = 498945824; //8192KB
+	iterations[MEMORY_STORE_IND][10] = 498638401; //16384KB
+	iterations[MEMORY_STORE_IND][11] = 498731343; //32768KB
+	iterations[MEMORY_STORE_IND][12] = 499341423; //65536KB
+	iterations[MEMORY_STORE_RANDOM][0] = 362441939; //16KB
+	iterations[MEMORY_STORE_RANDOM][1] = 303568244; //32KB
+	iterations[MEMORY_STORE_RANDOM][2] = 226412590; //64KB
+	iterations[MEMORY_STORE_RANDOM][3] = 189482672; //128KB
+	iterations[MEMORY_STORE_RANDOM][4] = 154180366; //256KB
+	iterations[MEMORY_STORE_RANDOM][5] = 135262208; //512KB
+	iterations[MEMORY_STORE_RANDOM][6] = 121658051; //1024KB
+	iterations[MEMORY_STORE_RANDOM][7] = 15213586; //2048KB
+	iterations[MEMORY_STORE_RANDOM][8] = 8762163; //4096KB
+	iterations[MEMORY_STORE_RANDOM][9] = 8116931; //8192KB
+	iterations[MEMORY_STORE_RANDOM][10] = 9534892; //16384KB
+	iterations[MEMORY_STORE_RANDOM][11] = 11110139; //32768KB
+	iterations[MEMORY_STORE_RANDOM][12] = 12458989; //65536KB
+	iterations[WORKLOAD_IDLE][0] = 0;
 }
 
 void init_class_A(){
-	uint64_t i = 0;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
-	iterations[i++] = 2;
+	iterations[CONTROL_COMPLEX][0] = 945899543;
+	iterations[CONTROL_CONDITIONAL][0] = 956757940;
+	iterations[CONTROL_RANDOM][0] = 57766744;
+	iterations[CONTROL_SMALL_BBL][0] = 1500044190;
+	iterations[CONTROL_SWITCH][0] = 982680794;
+	iterations[DEPENDENCY_CHAIN1][0] = 40621531;
+	iterations[DEPENDENCY_CHAIN2][0] = 70495570;
+	iterations[DEPENDENCY_CHAIN3][0] = 95813971;
+	iterations[DEPENDENCY_CHAIN4][0] = 104432313;
+	iterations[DEPENDENCY_CHAIN5][0] = 120954956;
+	iterations[DEPENDENCY_CHAIN6][0] = 129820576;
+	iterations[EXECUTION_FP_ADD_IND][0] = 178139683;
+	iterations[EXECUTION_FP_DIV_IND][0] = 42946779;
+	iterations[EXECUTION_FP_MUL_IND][0] = 351145519;
+	iterations[EXECUTION_INT_ADD_IND][0] = 132109878;
+	iterations[EXECUTION_INT_DIV_IND][0] = 8169954;
+	iterations[EXECUTION_INT_MUL_IND][0] = 126296006;
+	iterations[MEMORY_LOAD_DEP][0] = 997911488; //16KB
+	iterations[MEMORY_LOAD_DEP][1] = 547818475; //32KB
+	iterations[MEMORY_LOAD_DEP][2] = 528737621; //64KB
+	iterations[MEMORY_LOAD_DEP][3] = 554840149; //128KB
+	iterations[MEMORY_LOAD_DEP][4] = 512502101; //256KB
+	iterations[MEMORY_LOAD_DEP][5] = 511714987; //512KB
+	iterations[MEMORY_LOAD_DEP][6] = 472745984; //1024KB
+	iterations[MEMORY_LOAD_DEP][7] = 462303232; //2048KB
+	iterations[MEMORY_LOAD_DEP][8] = 129982464; //4096KB
+	iterations[MEMORY_LOAD_DEP][9] = 55929515; //8192KB
+	iterations[MEMORY_LOAD_DEP][10] = 68190208; //16384KB
+	iterations[MEMORY_LOAD_DEP][11] = 77463552; //32768KB
+	iterations[MEMORY_LOAD_DEP][12] = 93192192; //65536KB
+	iterations[MEMORY_LOAD_IND][0] = 1294112523; //16KB
+	iterations[MEMORY_LOAD_IND][1] = 1296502379; //32KB
+	iterations[MEMORY_LOAD_IND][2] = 1298342272; //64KB
+	iterations[MEMORY_LOAD_IND][3] = 1300037461; //128KB
+	iterations[MEMORY_LOAD_IND][4] = 1278506667; //256KB
+	iterations[MEMORY_LOAD_IND][5] = 1299353600; //512KB
+	iterations[MEMORY_LOAD_IND][6] = 1299585024; //1024KB
+	iterations[MEMORY_LOAD_IND][7] = 1299437382; //2048KB
+	iterations[MEMORY_LOAD_IND][8] = 1298819258; //4096KB
+	iterations[MEMORY_LOAD_IND][9] = 1300365312; //8192KB
+	iterations[MEMORY_LOAD_IND][10] = 1300341481; //16384KB
+	iterations[MEMORY_LOAD_IND][11] = 1296707212; //32768KB
+	iterations[MEMORY_LOAD_IND][12] = 1299900602; //65536KB
+	iterations[MEMORY_LOAD_RANDOM][0] = 1572710249; //16KB
+	iterations[MEMORY_LOAD_RANDOM][1] = 1437454499; //32KB
+	iterations[MEMORY_LOAD_RANDOM][2] = 1360599366; //64KB
+	iterations[MEMORY_LOAD_RANDOM][3] = 1240797184; //128KB
+	iterations[MEMORY_LOAD_RANDOM][4] = 999773836; //256KB
+	iterations[MEMORY_LOAD_RANDOM][5] = 851009536; //512KB
+	iterations[MEMORY_LOAD_RANDOM][6] = 741906991; //1024KB
+	iterations[MEMORY_LOAD_RANDOM][7] = 159157155; //2048KB
+	iterations[MEMORY_LOAD_RANDOM][8] = 69235805; //4096KB
+	iterations[MEMORY_LOAD_RANDOM][9] = 65684945; //8192KB
+	iterations[MEMORY_LOAD_RANDOM][10] = 76557964; //16384KB
+	iterations[MEMORY_LOAD_RANDOM][11] = 85053812; //32768KB
+	iterations[MEMORY_LOAD_RANDOM][12] = 104762275; //65536KB
+	iterations[MEMORY_STORE_IND][0] = 2489355148; //16KB
+	iterations[MEMORY_STORE_IND][1] = 2518942580; //32KB
+	iterations[MEMORY_STORE_IND][2] = 2522597981; //64KB
+	iterations[MEMORY_STORE_IND][3] = 2522503913; //128KB
+	iterations[MEMORY_STORE_IND][4] = 2520692550; //256KB
+	iterations[MEMORY_STORE_IND][5] = 2508260073; //512KB
+	iterations[MEMORY_STORE_IND][6] = 2504721873; //1024KB
+	iterations[MEMORY_STORE_IND][7] = 2492310249; //2048KB
+	iterations[MEMORY_STORE_IND][8] = 2487058432; //4096KB
+	iterations[MEMORY_STORE_IND][9] = 2494729123; //8192KB
+	iterations[MEMORY_STORE_IND][10] = 2493192006; //16384KB
+	iterations[MEMORY_STORE_IND][11] = 2493656716; //32768KB
+	iterations[MEMORY_STORE_IND][12] = 2496707119; //65536KB
+	iterations[MEMORY_STORE_RANDOM][0] = 1812209699; //16KB
+	iterations[MEMORY_STORE_RANDOM][1] = 1517841222; //32KB
+	iterations[MEMORY_STORE_RANDOM][2] = 1132062953; //64KB
+	iterations[MEMORY_STORE_RANDOM][3] = 947413364; //128KB
+	iterations[MEMORY_STORE_RANDOM][4] = 770901830; //256KB
+	iterations[MEMORY_STORE_RANDOM][5] = 676311040; //512KB
+	iterations[MEMORY_STORE_RANDOM][6] = 608290257; //1024KB
+	iterations[MEMORY_STORE_RANDOM][7] = 76067933; //2048KB
+	iterations[MEMORY_STORE_RANDOM][8] = 43810816; //4096KB
+	iterations[MEMORY_STORE_RANDOM][9] = 40584657; //8192KB
+	iterations[MEMORY_STORE_RANDOM][10] = 47674461; //16384KB
+	iterations[MEMORY_STORE_RANDOM][11] = 55550697; //32768KB
+	iterations[MEMORY_STORE_RANDOM][12] = 62294947; //65536KB
+	iterations[WORKLOAD_IDLE][0] = 0;
 }
 
 void init_class_B(){
-	uint64_t i = 0;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
-	iterations[i++] = 3;
+	iterations[CONTROL_COMPLEX][0] = 5659743064;
+	iterations[CONTROL_CONDITIONAL][0] = 5723862181;
+	iterations[CONTROL_RANDOM][0] = 342489089;
+	iterations[CONTROL_SMALL_BBL][0] = 8854536723;
+	iterations[CONTROL_SWITCH][0] = 5891354176;
+	iterations[DEPENDENCY_CHAIN1][0] = 243115453;
+	iterations[DEPENDENCY_CHAIN2][0] = 417198613;
+	iterations[DEPENDENCY_CHAIN3][0] = 565793229;
+	iterations[DEPENDENCY_CHAIN4][0] = 627031675;
+	iterations[DEPENDENCY_CHAIN5][0] = 721486663;
+	iterations[DEPENDENCY_CHAIN6][0] = 783040769;
+	iterations[EXECUTION_FP_ADD_IND][0] = 1080647116;
+	iterations[EXECUTION_FP_DIV_IND][0] = 268111189;
+	iterations[EXECUTION_FP_MUL_IND][0] = 2108332625;
+	iterations[EXECUTION_INT_ADD_IND][0] = 792143255;
+	iterations[EXECUTION_INT_DIV_IND][0] = 48972112;
+	iterations[EXECUTION_INT_MUL_IND][0] = 757876163;
+	iterations[MEMORY_LOAD_DEP][0] = 5957493702; //16KB
+	iterations[MEMORY_LOAD_DEP][1] = 3396304151; //32KB
+	iterations[MEMORY_LOAD_DEP][2] = 3233644032; //64KB
+	iterations[MEMORY_LOAD_DEP][3] = 3291565987; //128KB
+	iterations[MEMORY_LOAD_DEP][4] = 3080542208; //256KB
+	iterations[MEMORY_LOAD_DEP][5] = 3078386409; //512KB
+	iterations[MEMORY_LOAD_DEP][6] = 2781598813; //1024KB
+	iterations[MEMORY_LOAD_DEP][7] = 1526751977; //2048KB
+	iterations[MEMORY_LOAD_DEP][8] = 828634205; //4096KB
+	iterations[MEMORY_LOAD_DEP][9] = 332797766; //8192KB
+	iterations[MEMORY_LOAD_DEP][10] = 406978560; //16384KB
+	iterations[MEMORY_LOAD_DEP][11] = 471573225; //32768KB
+	iterations[MEMORY_LOAD_DEP][12] = 557318144; //65536KB
+	iterations[MEMORY_LOAD_IND][0] = 7766167366; //16KB
+	iterations[MEMORY_LOAD_IND][1] = 7780675351; //32KB
+	iterations[MEMORY_LOAD_IND][2] = 7785601210; //64KB
+	iterations[MEMORY_LOAD_IND][3] = 7780288419; //128KB
+	iterations[MEMORY_LOAD_IND][4] = 7789660532; //256KB
+	iterations[MEMORY_LOAD_IND][5] = 7796099258; //512KB
+	iterations[MEMORY_LOAD_IND][6] = 7790402839; //1024KB
+	iterations[MEMORY_LOAD_IND][7] = 7789757905; //2048KB
+	iterations[MEMORY_LOAD_IND][8] = 7792132096; //4096KB
+	iterations[MEMORY_LOAD_IND][9] = 7795233140; //8192KB
+	iterations[MEMORY_LOAD_IND][10] = 7787249664; //16384KB
+	iterations[MEMORY_LOAD_IND][11] = 7797044317; //32768KB
+	iterations[MEMORY_LOAD_IND][12] = 7783293673; //65536KB
+	iterations[MEMORY_LOAD_RANDOM][0] = 9448777274; //16KB
+	iterations[MEMORY_LOAD_RANDOM][1] = 8658606359; //32KB
+	iterations[MEMORY_LOAD_RANDOM][2] = 8210490880; //64KB
+	iterations[MEMORY_LOAD_RANDOM][3] = 7515403729; //128KB
+	iterations[MEMORY_LOAD_RANDOM][4] = 5974551831; //256KB
+	iterations[MEMORY_LOAD_RANDOM][5] = 5035921036; //512KB
+	iterations[MEMORY_LOAD_RANDOM][6] = 4396721617; //1024KB
+	iterations[MEMORY_LOAD_RANDOM][7] = 745652224; //2048KB
+	iterations[MEMORY_LOAD_RANDOM][8] = 428253929; //4096KB
+	iterations[MEMORY_LOAD_RANDOM][9] = 399388300; //8192KB
+	iterations[MEMORY_LOAD_RANDOM][10] = 450351476; //16384KB
+	iterations[MEMORY_LOAD_RANDOM][11] = 532342970; //32768KB
+	iterations[MEMORY_LOAD_RANDOM][12] = 612845009; //65536KB
+	iterations[MEMORY_STORE_IND][0] = 14924057693; //16KB
+	iterations[MEMORY_STORE_IND][1] = 15055351017; //32KB
+	iterations[MEMORY_STORE_IND][2] = 15159913612; //64KB
+	iterations[MEMORY_STORE_IND][3] = 15127753821; //128KB
+	iterations[MEMORY_STORE_IND][4] = 15118805364; //256KB
+	iterations[MEMORY_STORE_IND][5] = 15009778223; //512KB
+	iterations[MEMORY_STORE_IND][6] = 14921462132; //1024KB
+	iterations[MEMORY_STORE_IND][7] = 15030185612; //2048KB
+	iterations[MEMORY_STORE_IND][8] = 14953474234; //4096KB
+	iterations[MEMORY_STORE_IND][9] = 14991205097; //8192KB
+	iterations[MEMORY_STORE_IND][10] = 14989727558; //16384KB
+	iterations[MEMORY_STORE_IND][11] = 14962488413; //32768KB
+	iterations[MEMORY_STORE_IND][12] = 14966658886; //65536KB
+	iterations[MEMORY_STORE_RANDOM][0] = 10814602927; //16KB
+	iterations[MEMORY_STORE_RANDOM][1] = 9080224186; //32KB
+	iterations[MEMORY_STORE_RANDOM][2] = 6782487087; //64KB
+	iterations[MEMORY_STORE_RANDOM][3] = 5696081082; //128KB
+	iterations[MEMORY_STORE_RANDOM][4] = 4634155753; //256KB
+	iterations[MEMORY_STORE_RANDOM][5] = 4062075439; //512KB
+	iterations[MEMORY_STORE_RANDOM][6] = 3606607686; //1024KB
+	iterations[MEMORY_STORE_RANDOM][7] = 455437964; //2048KB
+	iterations[MEMORY_STORE_RANDOM][8] = 262444870; //4096KB
+	iterations[MEMORY_STORE_RANDOM][9] = 244943779; //8192KB
+	iterations[MEMORY_STORE_RANDOM][10] = 278611409; //16384KB
+	iterations[MEMORY_STORE_RANDOM][11] = 329062214; //32768KB
+	iterations[MEMORY_STORE_RANDOM][12] = 367382900; //65536KB
+	iterations[WORKLOAD_IDLE][0] = 0;
 }
 
 void init_class_C(){
-	uint64_t i = 0;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
-	iterations[i++] = 4;
+	iterations[CONTROL_COMPLEX][0] = 11429171010;
+	iterations[CONTROL_CONDITIONAL][0] = 11450281175;
+	iterations[CONTROL_RANDOM][0] = 691820796;
+	iterations[CONTROL_SMALL_BBL][0] = 18181335730;
+	iterations[CONTROL_SWITCH][0] = 11798603206;
+	iterations[DEPENDENCY_CHAIN1][0] = 486551269;
+	iterations[DEPENDENCY_CHAIN2][0] = 831921433;
+	iterations[DEPENDENCY_CHAIN3][0] = 1151930167;
+	iterations[DEPENDENCY_CHAIN4][0] = 1273947776;
+	iterations[DEPENDENCY_CHAIN5][0] = 1468295836;
+	iterations[DEPENDENCY_CHAIN6][0] = 1562504802;
+	iterations[EXECUTION_FP_ADD_IND][0] = 2108226007;
+	iterations[EXECUTION_FP_DIV_IND][0] = 511461171;
+	iterations[EXECUTION_FP_MUL_IND][0] = 4293107171;
+	iterations[EXECUTION_INT_ADD_IND][0] = 1585778047;
+	iterations[EXECUTION_INT_DIV_IND][0] = 98139806;
+	iterations[EXECUTION_INT_MUL_IND][0] = 1511582954;
+	iterations[MEMORY_LOAD_DEP][0] = 11976905996; //16KB
+	iterations[MEMORY_LOAD_DEP][1] = 6670170531; //32KB
+	iterations[MEMORY_LOAD_DEP][2] = 6450912396; //64KB
+	iterations[MEMORY_LOAD_DEP][3] = 6412599668; //128KB
+	iterations[MEMORY_LOAD_DEP][4] = 6135612137; //256KB
+	iterations[MEMORY_LOAD_DEP][5] = 6152439622; //512KB
+	iterations[MEMORY_LOAD_DEP][6] = 5925756928; //1024KB
+	iterations[MEMORY_LOAD_DEP][7] = 3193135849; //2048KB
+	iterations[MEMORY_LOAD_DEP][8] = 585453940; //4096KB
+	iterations[MEMORY_LOAD_DEP][9] = 680716474; //8192KB
+	iterations[MEMORY_LOAD_DEP][10] = 827409873; //16384KB
+	iterations[MEMORY_LOAD_DEP][11] = 931397632; //32768KB
+	iterations[MEMORY_LOAD_DEP][12] = 1118496954; //65536KB
+	iterations[MEMORY_LOAD_IND][0] = 15531475503; //16KB
+	iterations[MEMORY_LOAD_IND][1] = 15553604608; //32KB
+	iterations[MEMORY_LOAD_IND][2] = 15566087215; //64KB
+	iterations[MEMORY_LOAD_IND][3] = 15579073350; //128KB
+	iterations[MEMORY_LOAD_IND][4] = 15309793466; //256KB
+	iterations[MEMORY_LOAD_IND][5] = 15567935302; //512KB
+	iterations[MEMORY_LOAD_IND][6] = 15584843590; //1024KB
+	iterations[MEMORY_LOAD_IND][7] = 15584261213; //2048KB
+	iterations[MEMORY_LOAD_IND][8] = 15588440623; //4096KB
+	iterations[MEMORY_LOAD_IND][9] = 15586724771; //8192KB
+	iterations[MEMORY_LOAD_IND][10] = 15594040972; //16384KB
+	iterations[MEMORY_LOAD_IND][11] = 15589084067; //32768KB
+	iterations[MEMORY_LOAD_IND][12] = 15593278371; //65536KB
+	iterations[MEMORY_LOAD_RANDOM][0] = 18904209210; //16KB
+	iterations[MEMORY_LOAD_RANDOM][1] = 17259223343; //32KB
+	iterations[MEMORY_LOAD_RANDOM][2] = 16380481536; //64KB
+	iterations[MEMORY_LOAD_RANDOM][3] = 15081157073; //128KB
+	iterations[MEMORY_LOAD_RANDOM][4] = 11997600303; //256KB
+	iterations[MEMORY_LOAD_RANDOM][5] = 10114395788; //512KB
+	iterations[MEMORY_LOAD_RANDOM][6] = 8658841228; //1024KB
+	iterations[MEMORY_LOAD_RANDOM][7] = 2705993356; //2048KB
+	iterations[MEMORY_LOAD_RANDOM][8] = 862549085; //4096KB
+	iterations[MEMORY_LOAD_RANDOM][9] = 814403956; //8192KB
+	iterations[MEMORY_LOAD_RANDOM][10] = 919601152; //16384KB
+	iterations[MEMORY_LOAD_RANDOM][11] = 1025840966; //32768KB
+	iterations[MEMORY_LOAD_RANDOM][12] = 1252667020; //65536KB
+	iterations[MEMORY_STORE_IND][0] = 29848532224; //16KB
+	iterations[MEMORY_STORE_IND][1] = 30107401937; //32KB
+	iterations[MEMORY_STORE_IND][2] = 30202487063; //64KB
+	iterations[MEMORY_STORE_IND][3] = 30252897652; //128KB
+	iterations[MEMORY_STORE_IND][4] = 30301594717; //256KB
+	iterations[MEMORY_STORE_IND][5] = 30004652218; //512KB
+	iterations[MEMORY_STORE_IND][6] = 30134932573; //1024KB
+	iterations[MEMORY_STORE_IND][7] = 30029916346; //2048KB
+	iterations[MEMORY_STORE_IND][8] = 29971629521; //4096KB
+	iterations[MEMORY_STORE_IND][9] = 30026039296; //8192KB
+	iterations[MEMORY_STORE_IND][10] = 29914669801; //16384KB
+	iterations[MEMORY_STORE_IND][11] = 29935224273; //32768KB
+	iterations[MEMORY_STORE_IND][12] = 29766498863; //65536KB
+	iterations[MEMORY_STORE_RANDOM][0] = 21746188812; //16KB
+	iterations[MEMORY_STORE_RANDOM][1] = 18127075491; //32KB
+	iterations[MEMORY_STORE_RANDOM][2] = 13624963025; //64KB
+	iterations[MEMORY_STORE_RANDOM][3] = 11444278458; //128KB
+	iterations[MEMORY_STORE_RANDOM][4] = 9263666641; //256KB
+	iterations[MEMORY_STORE_RANDOM][5] = 8128599133; //512KB
+	iterations[MEMORY_STORE_RANDOM][6] = 7295759453; //1024KB
+	iterations[MEMORY_STORE_RANDOM][7] = 908588125; //2048KB
+	iterations[MEMORY_STORE_RANDOM][8] = 526939229; //4096KB
+	iterations[MEMORY_STORE_RANDOM][9] = 511973190; //8192KB
+	iterations[MEMORY_STORE_RANDOM][10] = 571497751; //16384KB
+	iterations[MEMORY_STORE_RANDOM][11] = 628668975; //32768KB
+	iterations[MEMORY_STORE_RANDOM][12] = 748254301; //65536KB
+	iterations[WORKLOAD_IDLE][0] = 0;
 }
 
 void set_workload_iterations(char class){
 	uint64_t i;
+	iterations = (uint64_t **) (malloc(NWORKLOADS * sizeof(uint64_t *)));
+	for(i = 0; i < NWORKLOADS; i++){
+		if(i < 17)
+			iterations[i] = (uint64_t *) (calloc(1,     sizeof(uint64_t)));
+		else
+			iterations[i] = (uint64_t *) (calloc(13, sizeof(uint64_t)));
+	}
+			
 	if(class == 'A')
 		init_class_A();
 	else if(class == 'B')
@@ -127,8 +372,20 @@ void set_workload_iterations(char class){
 	else
 		init_class();
 
-	for(i = 0; i < nt; i++)
-		threads[i].iterations = iterations[threads[i].typeA];
+	for(i = 0; i < nt; i++){
+		if(threads[i].memoryA <= (unsigned long int) powf(2, 12 + 4)){
+			if(threads[i].memoryA == 0)
+				threads[i].iterations = iterations[threads[i].typeA][0];
+			else
+				threads[i].iterations = iterations[threads[i].typeA][(int) log2f(threads[i].memoryA) - 4];
+		}
+		  else
+		  	threads[i].iterations = iterations[threads[i].typeA][12];
+	}
+
+	for(i = 0; i < NWORKLOADS; i++)
+		free(iterations[i]);
+	free(iterations);
 }
 
 void init_workload(){

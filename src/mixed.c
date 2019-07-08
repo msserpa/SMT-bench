@@ -147,6 +147,7 @@ void parse_type_vector(const char *argv, char class){
 		threads[i].typeB = workload[(i + 1) % n];
 		threads[i].memoryB = memory[(i + 1) % n];
 	}
+	
 	set_workload_iterations(class);
 
 	free(workload);

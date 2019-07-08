@@ -20,14 +20,15 @@ int compare(const void *s1, const void *s2){
 	thread_data_t *t2 = (thread_data_t *) s2;
 	int cmp = strcmp(workload_name[t1->typeA], workload_name[t2->typeA]);
 
-	if(cmp > 0 || (cmp == 0 && t1->memoryA > t2->memoryA))
+	if(cmp > 0 || (cmp == 0 && t1->memoryA > t2->memoryA) || (cmp == 0 && t1->memoryA == t2->memoryA && t1->time > t2->time))
 		return 1;
 	return -1;
 }
 
 int main(int argc, char **argv){
 	printf("PAPI-based microarchitectural benchmark\n\n");
-	uint64_t i, iterations, memory;
+	uint64_t i, j, memory;
+	double min, max, avg;
 	workload_t workload;
 	pthread_t *ts = NULL;
 
@@ -103,44 +104,44 @@ int main(int argc, char **argv){
 
 	qsort(threads, nt, sizeof(thread_data_t), compare);
 
-
-	for(i = 0; i < nt; i++){
-		if(threads[i].memoryA == 0)
-			fprintf(stderr, "%s:%lu %lf\n", workload_name[threads[i].typeA], threads[i].iterations, threads[i].time);
-		else
-			fprintf(stderr, "%s-%luKB:%lu %lf\n", workload_name[threads[i].typeA], threads[i].memoryA, threads[i].iterations, threads[i].time);
+	workload = threads[0].typeA;
+	memory = threads[0].memoryA;
+	j = 1;
+	min = threads[0].time;
+	max = threads[0].time;
+	avg = threads[0].time;
+	for(i = 1; i < nt; i++){
+		if(threads[i].typeA == workload && threads[i].memoryA == memory){
+			avg += threads[i].time;
+			max = threads[i].time;
+			j++;
+		}else{
+			if(memory == 0){
+				fprintf(stderr, "%s:min:%lf\n", workload_name[workload], min);
+				fprintf(stderr, "%s:max:%lf\n", workload_name[workload], max);
+				fprintf(stderr, "%s:avg:%lf\n", workload_name[workload], avg / (double) j);
+			}else{
+				fprintf(stderr, "%s-%luKB:min:%lf\n", workload_name[workload], memory, min);
+				fprintf(stderr, "%s-%luKB:max:%lf\n", workload_name[workload], memory, max);
+				fprintf(stderr, "%s-%luKB:avg:%lf\n", workload_name[workload], memory, avg / (double) j);
+			}
+			workload = threads[i].typeA;
+			memory = threads[i].memoryA;
+			j = 1;
+			min = threads[i].time;
+			max = threads[i].time;
+			avg = threads[i].time;
+		}
 	}
-
-	// workload = threads[0].typeA;
-	// memory = threads[0].memoryA;
-	// loops = threads[0].iterations;
-	// for(i = 1; i < nt; i++){
-	// 	if(threads[i].typeA == workload && threads[i].memoryA == memory)
-	// 		loops += threads[i].iterations;
-	// 	else{
-	// 		if(memory == 0)
-	// 			fprintf(stderr, "%s:%lu\n", workload_name[workload], loops);
-	// 		else
-	// 			fprintf(stderr, "%s-%luKB:%lu\n", workload_name[workload], memory, loops);
-	// 		workload = threads[i].typeA;
-	// 		memory = threads[i].memoryA;
-	// 		loops = threads[i].iterations;
-	// 	}
-	// }
-	// if(memory == 0)
-	// 	fprintf(stderr, "%s:%lu\n", workload_name[workload], loops);
-	// else
-	// 	fprintf(stderr, "%s-%luKB:%lu\n", workload_name[workload], memory, loops);
-
-	// for(i = 0; i < NWORKLOADS; i++)
-	// 	loops[i] = 0;
-
-	// for(i = 0; i < nt; i++)
-	// 	loops[threads[i].typeA] += threads[i].iterations;
-
-	// for(i = 0; i < NWORKLOADS; i++)
-	// 	if(loops[i] != 0)
-	// 		fprintf(stderr, "%s:%lu\n", workload_name[i], loops[i]);
+	if(memory == 0){
+		fprintf(stderr, "%s:min:%lf\n", workload_name[workload], min);
+		fprintf(stderr, "%s:max:%lf\n", workload_name[workload], max);
+		fprintf(stderr, "%s:avg:%lf\n", workload_name[workload], avg / (double) j);
+	}else{
+		fprintf(stderr, "%s-%luKB:min:%lf\n", workload_name[workload], memory, min);
+		fprintf(stderr, "%s-%luKB:max:%lf\n", workload_name[workload], memory, max);
+		fprintf(stderr, "%s-%luKB:avg:%lf\n", workload_name[workload], memory, avg / (double) j);
+	}
 
 	map_terminate();
 
