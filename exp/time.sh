@@ -3,7 +3,7 @@
 #set -o errexit -o nounset -o pipefail -o posix
 chunk=100
 
-for step in `seq 1 30`; do
+for step in `seq 1 15`; do
 	./DoE.R $step
 	size=`cat DoE.$step.csv | wc -l`
 	for begin in `seq 1 $chunk $size`; do
