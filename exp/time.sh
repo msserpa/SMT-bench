@@ -1,16 +1,22 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-set -o errexit -o nounset -o pipefail -o posix
+#set -o errexit -o nounset -o pipefail -o posix
+chunk=100
 
 for step in `seq 1 30`; do
-	#broadwell
-    sbatch --job-name="micro.time.$step" --partition=tupi --time=72:00:00 --output="slurm/tupi.time.$step.out" --error="slurm/tupi.time.$step.err" time.batch $step
-	#ivybridge
-	sbatch --job-name="micro.time.$step" --partition=draco --time=72:00:00 --output="slurm/draco.time.$step.out" --error="slurm/draco.time.$step.err" time.batch $step
-	#sandybridge
-	sbatch --job-name="micro.time.$step" --partition=beagle --time=72:00:00 --output="slurm/beagle.time.$step.out" --error="slurm/beagle.time.$step.err" time.batch $step
-	#nehalem
-	sbatch --job-name="micro.time.$step" --partition=turing --time=72:00:00 --output="slurm/turing.time.$step.out" --error="slurm/turing.time.$step.err" time.batch $step
-	#haswell
-	sbatch --job-name="micro.time.$step" --partition=hype --time=72:00:00 --output="slurm/hype.time.$step.out" --error="slurm/hype.time.$step.err" time.batch $step
+	./DoE.R $step
+	size=`cat DoE.$step.csv | wc -l`
+	for begin in `seq 1 $chunk $size`; do
+		end=$(($begin + $chunk - 1))
+		#broadwell
+	    sbatch --job-name="micro($step)-$begin:$end" --partition=tupi   --output="slurm/tupi.time.$step.$begin.$end.out"   --error="slurm/tupi.$step.$begin.$end.err"   time.batch $step $begin $end
+		#ivybridge
+		sbatch --job-name="micro($step)-$begin:$end" --partition=draco  --output="slurm/draco.time.$step.$begin.$end.out"  --error="slurm/draco.$step.$begin.$end.err"  time.batch $step $begin $end
+		#sandybridge
+		sbatch --job-name="micro($step)-$begin:$end" --partition=beagle --output="slurm/beagle.time.$step.$begin.$end.out" --error="slurm/beagle.$step.$begin.$end.err" time.batch $step $begin $end
+		#nehalem
+		sbatch --job-name="micro($step)-$begin:$end" --partition=turing --output="slurm/turing.time.$step.$begin.$end.out" --error="slurm/turing.$step.$begin.$end.err" time.batch $step $begin $end
+		#haswell
+		sbatch --job-name="micro($step)-$begin:$end" --partition=hype   --output="slurm/hype.time.$step.$begin.$end.out"   --error="slurm/hype.$step.$begin.$end.err"   time.batch $step $begin $end
+	done
 done
