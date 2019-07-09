@@ -58,6 +58,7 @@ exp/*
 lib/*
 !exp/*.sh
 !exp/*.batch
+!exp/*.R
 
 # keep for empty dirs
 !.keep
