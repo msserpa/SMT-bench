@@ -9,7 +9,7 @@ for step in `seq 1 15`; do
 	for begin in `seq 1 $chunk $size`; do
 		end=$(($begin + $chunk - 1))
 		#broadwell
-	    sbatch --job-name="micro($step)-$begin:$end" --partition=tupi   --output="slurm/tupi.time.$step.$begin.$end.out"   --error="slurm/tupi.$step.$begin.$end.err"   time.batch $step $begin $end
+	        sbatch --job-name="micro($step)-$begin:$end" --partition=tupi   --output="slurm/tupi.time.$step.$begin.$end.out"   --error="slurm/tupi.$step.$begin.$end.err"   time.batch $step $begin $end
 		#ivybridge
 		sbatch --job-name="micro($step)-$begin:$end" --partition=draco  --output="slurm/draco.time.$step.$begin.$end.out"  --error="slurm/draco.$step.$begin.$end.err"  time.batch $step $begin $end
 		#sandybridge

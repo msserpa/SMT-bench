@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --exclude=tupi1,hype4,hype5,orion2,draco1,draco6,draco7
+#SBATCH --exclude=tupi1
 #SBATCH --exclusive
-#SBATCH --time=02:00:00
+#SBATCH --time=04:00:00
 
 date +"%d/%m/%Y %H:%M:%S"
 printf "\t Running on $SLURM_JOB_NODELIST \n\n"
@@ -17,6 +17,8 @@ end=$3
 
 host=`hostname`
 arch=`gcc -march=native -Q --help=target | grep march | awk '{print $2}'`
+
+cat DoE.$step.csv | head -n "$end" | tail -n +"$begin" > $SCRATCH/DoE.csv
 
 date +"%d/%m/%Y %H:%M:%S"
 exec=mixed.$host
@@ -35,8 +37,7 @@ unset -v LD_PRELOAD
 
 date +"%d/%m/%Y %H:%M:%S"
 printf "\t Warm-up\n"
-$exec idle rand B &> /dev/null
-
+stress-ng --cpu 100 -t 5 
 while IFS=, read -r mapping appA appB; do
 	echo $step $mapping $appA $appB
 
@@ -69,7 +70,7 @@ while IFS=, read -r mapping appA appB; do
 	echo $host,$arch,$mapping,$appA,$appB,$perfAmin,$perfAmax,$perfAavg >> output/$host.$step.$begin.$end.time
 	echo $host,$arch,$mapping,$appB,$appA,$perfBmin,$perfBmax,$perfBavg >> output/$host.$step.$begin.$end.time
 	[[ -s /tmp/micro.time.err ]] || echo "error"	
-done < DoE.$step.csv | head -n "$end" | tail -n +"$begin"
+done < $SCRATCH/DoE.csv
 
 date +"%d/%m/%Y %H:%M:%S"
 printf "\t done \n\n"
