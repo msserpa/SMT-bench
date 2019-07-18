@@ -54,12 +54,7 @@ dkms.conf
 # Ignore bin build exp and lib dirs
 bin/*
 build/*
-exp/*
-lib/*
-!exp/*.sh
-!exp/*.batch
-!exp/*.R
-
+exp/scripts/*
 # keep for empty dirs
 !.keep
 
