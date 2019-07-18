@@ -11,8 +11,8 @@ printf "\t Running on $arch@$host \n\n"
 date +"%d/%m/%Y %H:%M:%S"
 exec=mixed.$host
 make -C .. &> /tmp/time.make
-mv ../bin/$exec $SCRATCH/$exec
-exec=$SCRATCH$exec
+mv ../bin/$exec /tmp/$exec
+exec=/tmp/$exec
 sed 's/^/\t/' /tmp/time.make
 printf "\n"
 
@@ -85,3 +85,4 @@ while true; do
 
 	rm $doe
 done
+
