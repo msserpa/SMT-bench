@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -o errexit -o nounset -o pipefail -o posix
+#set -o errexit -o nounset -o pipefail -o posix
 
 host=`hostname`
 arch=`gcc -march=native -Q --help=target | grep march | awk '{print $2}'`
