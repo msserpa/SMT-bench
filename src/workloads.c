@@ -1560,7 +1560,7 @@ void memory_store_random(thread_data_t *t){
 }
 
 void workload_idle(thread_data_t *t){
-	uint64_t i = 0;
+	/*uint64_t i = 0;
 
 	do{
 		__asm__ __volatile__ ("pause");
@@ -1569,5 +1569,5 @@ void workload_idle(thread_data_t *t){
 		__asm__ __volatile__ ("pause");
 		__asm__ __volatile__ ("pause");
 		i++;
-	}while(i < t->iterations);
+	}while(i < t->iterations);*/
 }
