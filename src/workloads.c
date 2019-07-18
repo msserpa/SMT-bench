@@ -416,6 +416,7 @@ void init_workload(){
 }
 
 void control_complex(thread_data_t *t){
+	printf("control_complex\n");
 	uint64_t i = 0, j = -1, k = 2, l = 3, m = -1, n = 5,o = 6;
 
 	do{
@@ -455,6 +456,7 @@ void control_complex(thread_data_t *t){
 }
 
 void control_conditional(thread_data_t *t){
+	printf("control_conditional\n");
 	uint64_t i = 0, jump = 1, print = 0;
 
 	do{
@@ -472,6 +474,7 @@ void control_conditional(thread_data_t *t){
 }
 
 void control_random(thread_data_t *t){
+	printf("control_random\n");
 	uint64_t i = 0, jump = 1, lfsr = 0x80000000, bit;
 
 	do{
@@ -515,6 +518,7 @@ void control_random(thread_data_t *t){
 }
 
 void control_small_bbl(thread_data_t *t){
+	printf("control_small_bbl\n");
 	uint64_t i = 0, j, print = 0, count[64];
    
    	for(j = 0; j < 64; j++)
@@ -531,6 +535,7 @@ void control_small_bbl(thread_data_t *t){
 }
 
 void control_switch(thread_data_t *t){
+	printf("control_switch\n");
 	uint64_t i = 0, inner_repetitions = 4E10;
 	uint64_t jump = 1, print = 1;
     uint64_t jump_1  = inner_repetitions *  1;
@@ -607,6 +612,7 @@ void control_switch(thread_data_t *t){
 }
 
 void dependency_chain1(thread_data_t *t){
+	printf("dependency_chain1\n");
 	uint64_t i = 0, count0 = 0;
 
 	do{
@@ -652,6 +658,7 @@ void dependency_chain1(thread_data_t *t){
 }
 
 void dependency_chain2(thread_data_t *t){
+	printf("dependency_chain2\n");
 	uint64_t i = 0, count0 = 0, count1 = 0;
 
 	do{
@@ -698,6 +705,7 @@ void dependency_chain2(thread_data_t *t){
 
 
 void dependency_chain3(thread_data_t *t){
+	printf("dependency_chain3\n");
 	uint64_t i = 0, count0 = 0, count1 = 0, count2 = 0;
 
 	do{
@@ -747,6 +755,7 @@ void dependency_chain3(thread_data_t *t){
 }
 
 void dependency_chain4(thread_data_t *t){
+	printf("dependency_chain4\n");
 	uint64_t i = 0, count0 = 0, count1 = 0, count2 = 0, count3 = 0;
 
 	do{
@@ -796,6 +805,7 @@ void dependency_chain4(thread_data_t *t){
 }
 
 void dependency_chain5(thread_data_t *t){
+	printf("dependency_chain5\n");
 	uint64_t i = 0, count0 = 0, count1 = 0, count2 = 0, count3 = 0, count4 = 0;
 
 	do{
@@ -841,6 +851,7 @@ void dependency_chain5(thread_data_t *t){
 }
 
 void dependency_chain6(thread_data_t *t){
+	printf("dependency_chain6\n");
 	uint64_t i = 0, count0 = 0, count1 = 0, count2 = 0, count3 = 0, count4 = 0, count5 = 0;
 
 	do{
@@ -885,6 +896,7 @@ void dependency_chain6(thread_data_t *t){
 }
 
 void execution_fp_add_ind(thread_data_t *t){
+	printf("execution_fp_add_ind\n");
 	uint64_t i = 0;
 	double count = 0.00, in = 0.00;
 
@@ -958,6 +970,7 @@ void execution_fp_add_ind(thread_data_t *t){
 }
 
 void execution_fp_div_ind(thread_data_t *t){
+	printf("execution_fp_div_ind\n");
 	uint64_t i = 0;
 	double count = 0.00, in = 1.00;
 
@@ -1030,6 +1043,7 @@ void execution_fp_div_ind(thread_data_t *t){
 }
 
 void execution_fp_mul_ind(thread_data_t *t){
+	printf("execution_fp_mul_ind\n");
 	uint64_t i = 0;
 	double count = 0.00, in = 1.00;
 
@@ -1103,6 +1117,7 @@ void execution_fp_mul_ind(thread_data_t *t){
 }
 
 void execution_int_add_ind(thread_data_t *t){
+	printf("execution_int_add_ind\n");
 	uint64_t i = 0, count0 = 0, count1 = 0, count2 = 0, count3 = 0, count4 = 0, count5 = 0, count6 = 0, count7 = 0;
 
 	do{
@@ -1148,6 +1163,7 @@ void execution_int_add_ind(thread_data_t *t){
 }
 
 void execution_int_div_ind(thread_data_t *t){
+	printf("execution_int_div_ind\n");
 	uint64_t i = 0, count = 0;
 
 	asm volatile("mov $0x0, %%rax" : : : "rax");
@@ -1198,6 +1214,7 @@ void execution_int_div_ind(thread_data_t *t){
 }
 
 void execution_int_mul_ind(thread_data_t *t){
+	printf("execution_int_mul_ind\n");
 	uint64_t i = 0, count0 = 1, count1 = 1, count2 = 1, count3 = 1, count4 = 1, count5 = 1, count6 = 1, count7 = 1;
 
 	do{
@@ -1349,6 +1366,7 @@ void init_vec(thread_data_t *t){
 }
 
 void memory_load_ind(thread_data_t *t){
+	printf("memory_load_ind\n");
 	uint64_t i = 0, j, jump = 0, count = 0, length = t->memoryA * 1024 / sizeof(vec_t);
 
 	do{
@@ -1396,6 +1414,7 @@ void memory_load_ind(thread_data_t *t){
 }
 
 void memory_load_random(thread_data_t *t){
+	printf("memory_load_random\n");
 	uint64_t i = 0, j, jump = 1, print = 0, count[32], length = t->memoryA * 1024 / sizeof(vec_t);
 	unsigned bit;
 	unsigned int lfsr = 0x80000000;
@@ -1456,6 +1475,7 @@ void memory_load_random(thread_data_t *t){
 }
 
 void memory_store_ind(thread_data_t *t){
+	printf("memory_store_ind\n");
 	uint64_t i = 0, j, jump = 0, print = 0,length = t->memoryA * 1024 / sizeof(vec_t);
 
 	do{
@@ -1504,6 +1524,7 @@ void memory_store_ind(thread_data_t *t){
 }
 
 void memory_store_random(thread_data_t *t){
+	printf("memory_store_random\n");
 	uint64_t i = 0, j, jump = 1, print = 0, length = t->memoryA * 1024 / sizeof(vec_t);
 	unsigned bit;
 	unsigned int lfsr = 0x80000000;
@@ -1560,14 +1581,6 @@ void memory_store_random(thread_data_t *t){
 }
 
 void workload_idle(thread_data_t *t){
-	/*uint64_t i = 0;
-
-	do{
-		__asm__ __volatile__ ("pause");
-		__asm__ __volatile__ ("pause");
-		__asm__ __volatile__ ("pause");
-		__asm__ __volatile__ ("pause");
-		__asm__ __volatile__ ("pause");
-		i++;
-	}while(i < t->iterations);*/
+	printf("workload_idle\n");
+	__asm__ __volatile__ ("pause");
 }
