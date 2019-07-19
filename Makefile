@@ -7,15 +7,14 @@ SOURCES := $(shell find src -type f -name *.c)
 OBJECTS := $(patsubst src/%,build/%,$(SOURCES:.c=.$(HOST).o))
 CFLAGS := -O0 -Wall -Wextra 
 #-xHost -qopt-report=5
-LDFLAGS := -lpthread -L/tmp/papi/lib/ -lpapi -lm
-INC := -I/tmp/papi/include/
+LDFLAGS := -lpthread -L/usr/local/lib/ -lpapi -lm
 
 $(TARGET): $(OBJECTS)
 	@echo " Linking..."
 	@echo " $(CC) $^ -o $(TARGET) $(LDFLAGS)"; $(CC) $^ -o $(TARGET) $(LDFLAGS)
 
 build/%.$(HOST).o: src/%.c
-	@echo " $(CC) $(CFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) $(INC) -c -o $@ $<
+	@echo " $(CC) $(CFLAGS) $(INC) -c -o $@ $<"; $(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
 	@echo " Cleaning..."; 
