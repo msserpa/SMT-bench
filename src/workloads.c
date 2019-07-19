@@ -96,6 +96,7 @@ void init_class(){
 }
 
 void init_class_A(){
+	printf("init_class_A\n");
 	iterations[CONTROL_COMPLEX][0] = 945899543;
 	iterations[CONTROL_CONDITIONAL][0] = 956757940;
 	iterations[CONTROL_RANDOM][0] = 57766744;
@@ -1288,6 +1289,7 @@ void free_list(thread_data_t *t){
 }
 
 void memory_load_dep(thread_data_t *t){
+	printf("memory_load_dep\n");
 	uint64_t i = 0, j = 0, print = 0, length = t->memoryA * 1024 / sizeof(list_t);
 	list_t *ptr_this;
 
