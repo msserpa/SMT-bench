@@ -15,16 +15,6 @@ uint32_t os_enabled = 0;
 extern thread_data_t *threads;
 extern uint32_t nt;
 
-int compare(const void *s1, const void *s2){
-	thread_data_t *t1 = (thread_data_t *) s1;
-	thread_data_t *t2 = (thread_data_t *) s2;
-	int cmp = strcmp(workload_name[t1->typeA], workload_name[t2->typeA]);
-
-	if(cmp > 0 || (cmp == 0 && t1->memoryA > t2->memoryA) || (cmp == 0 && t1->memoryA == t2->memoryA && t1->time > t2->time))
-		return 1;
-	return -1;
-}
-
 void swap(thread_data_t *A, thread_data_t *B){
     thread_data_t tmp = *A;
     *A = *B;
@@ -36,8 +26,7 @@ void selection_sort(thread_data_t *A, int N){
     for(i = 0; i < N - 1; i++){
         min = i;
         for(j = i + 1; j < N; j++){
-        	int cmp = strcmp(workload_name[A[j].typeA], workload_name[A[min].typeA]);
-            // if(cmp > 0 || (cmp == 0 && A[j].memoryA > A[min].memoryA) || (cmp == 0 && A[j].memoryA == A[min].memoryA && A[j].time > A[min].time))
+            int cmp = strcmp(workload_name[A[j].typeA], workload_name[A[min].typeA]);
             if(cmp < 0 || (cmp == 0 && A[j].memoryA < A[min].memoryA) || (cmp == 0 && A[j].memoryA == A[min].memoryA && A[j].time < A[min].time))
                 min = j;
         }
@@ -123,17 +112,7 @@ int main(int argc, char **argv){
 		
 	}
 
-	printf("\n\nbefore\n");
-	for(i = 0; i < nt; i++){
-		printf("\t%s:%ld = %lf\n", workload_name[threads[i].typeA], threads[i].memoryA, threads[i].time);
-	}
 	selection_sort(threads, nt);
-	//qsort(threads, nt, sizeof(thread_data_t), compare);
-	printf("\nafter\n");
-	for(i = 0; i < nt; i++){
-		printf("\t%s:%ld = %lf\n", workload_name[threads[i].typeA], threads[i].memoryA, threads[i].time);
-	}
-	printf("\n\n");
 
 	workload = threads[0].typeA;
 	memory = threads[0].memoryA;
