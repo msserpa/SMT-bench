@@ -7,7 +7,7 @@ SOURCES := $(shell find src -type f -name *.c)
 OBJECTS := $(patsubst src/%,build/%,$(SOURCES:.c=.$(HOST).o))
 CFLAGS := -O0 -Wall -Wextra 
 #-xHost -qopt-report=5
-LDFLAGS := -lpthread -L/usr/local/lib/ -lpapi -lm
+LDFLAGS := -lpthread -L$(HOME)/papi/lib/ -lpapi -lm
 INC := -I$(HOME)/papi/include/
 
 $(TARGET): $(OBJECTS)

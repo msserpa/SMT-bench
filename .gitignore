@@ -60,3 +60,6 @@ exp/scripts/*
 
 # Mac OS files
 *DS*Store*
+
+#NFS files
+*.nfs*
