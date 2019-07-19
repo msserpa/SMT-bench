@@ -7,8 +7,8 @@ SOURCES := $(shell find src -type f -name *.c)
 OBJECTS := $(patsubst src/%,build/%,$(SOURCES:.c=.$(HOST).o))
 CFLAGS := -O0 -Wall -Wextra 
 #-xHost -qopt-report=5
-LDFLAGS := -lpthread -L$(HOME)/papi/lib/ -lpapi -lm
-INC := -I$(HOME)/papi/include/
+LDFLAGS := -lpthread -L/tmp/papi/lib/ -lpapi -lm
+INC := -I/tmp/papi/include/
 
 $(TARGET): $(OBJECTS)
 	@echo " Linking..."
