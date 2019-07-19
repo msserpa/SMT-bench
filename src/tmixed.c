@@ -25,6 +25,27 @@ int compare(const void *s1, const void *s2){
 	return -1;
 }
 
+void swap(thread_data_t *A, thread_data_t *B){
+    thread_data_t tmp = *A;
+    *A = *B;
+    *B = tmp;
+}
+
+void selection_sort(thread_data_t *A, int N){
+    int i, j, min;
+    for(i = 0; i < N - 1; i++){
+        min = i;
+        for(j = i + 1; j < N; j++){
+        	int cmp = strcmp(workload_name[A[j].typeA], workload_name[A[min].typeA]);
+            // if(cmp > 0 || (cmp == 0 && A[j].memoryA > A[min].memoryA) || (cmp == 0 && A[j].memoryA == A[min].memoryA && A[j].time > A[min].time))
+            if(cmp < 0 || (cmp == 0 && A[j].memoryA < A[min].memoryA) || (cmp == 0 && A[j].memoryA == A[min].memoryA && A[j].time < A[min].time))
+                min = j;
+        }
+        if(A[i].tid != A[min].tid)
+            swap(&A[i], &A[min]);
+    }
+}
+
 int main(int argc, char **argv){
 	printf("PAPI-based microarchitectural benchmark\n\n");
 	uint64_t i, j, memory;
@@ -101,9 +122,19 @@ int main(int argc, char **argv){
 			free_vec(&threads[i]);
 		
 	}
-/*
-	qsort(threads, nt, sizeof(thread_data_t), compare);
-*/
+
+	printf("\n\nbefore\n");
+	for(i = 0; i < nt; i++){
+		printf("\t%s:%ld = %lf\n", workload_name[threads[i].typeA], threads[i].memoryA, threads[i].time);
+	}
+	selection_sort(threads, nt);
+	//qsort(threads, nt, sizeof(thread_data_t), compare);
+	printf("\nafter\n");
+	for(i = 0; i < nt; i++){
+		printf("\t%s:%ld = %lf\n", workload_name[threads[i].typeA], threads[i].memoryA, threads[i].time);
+	}
+	printf("\n\n");
+
 	workload = threads[0].typeA;
 	memory = threads[0].memoryA;
 	j = 1;
