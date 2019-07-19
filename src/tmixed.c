@@ -101,9 +101,9 @@ int main(int argc, char **argv){
 			free_vec(&threads[i]);
 		
 	}
-
+/*
 	qsort(threads, nt, sizeof(thread_data_t), compare);
-
+*/
 	workload = threads[0].typeA;
 	memory = threads[0].memoryA;
 	j = 1;
