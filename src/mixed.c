@@ -69,7 +69,7 @@ void *pthreads_callback (void *data){
 	if(!os_enabled)
 		libmapping_set_aff_thread(t->tid, t->cpu);
 	
-	if(papi_enabled)
+	if(papi_enabled && t->typeA != WORKLOAD_IDLE)
 		papi_thread_init(t);
 
 	double start = get_time();
@@ -79,7 +79,7 @@ void *pthreads_callback (void *data){
 	double end = get_time();
 	t->time = end - start;
 
-	if(papi_enabled)
+	if(papi_enabled && t->typeA != WORKLOAD_IDLE)
 		papi_thread_finish(t);
 
 	pthread_exit(NULL);

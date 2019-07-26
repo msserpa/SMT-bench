@@ -1,0 +1,68 @@
+#!/bin/bash
+
+#set -o errexit -o nounset -o pipefail -o posix
+
+host=`hostname`
+arch=`gcc -march=native -Q --help=target | grep march | awk '{print $2}'`
+
+date +"%d/%m/%Y %H:%M:%S"
+printf "\t Running on $arch@$host \n\n"
+
+date +"%d/%m/%Y %H:%M:%S"
+exec=mixed.$host
+make -C .. &> /tmp/time.make
+mv ../bin/$exec /tmp/$exec
+exec=/tmp/$exec
+sed 's/^/\t/' /tmp/time.make
+printf "\n"
+
+while true; do
+	step=`ls output/ | grep $host | tail -1 | awk -F. {'print $2'}`
+	if [ -z "$step" ]; then
+		step=0
+	fi
+
+	doe=./DoE/$host.csv
+	if [ -f "$doe" ]; then
+	    printf "\t Using old $doe\n"
+	else 
+	    ./DoE.sh papi
+	    step=$((step+1))
+	fi
+
+	output=./output/$host.$step.csv
+
+	unset -v KMP_AFFINITY
+	unset -v GOMP_CPU_AFFINITY
+	unset -v OMP_NUM_THREADS
+	unset -v OMP_SCHEDULE
+	unset -v PAPI_EVENT
+	unset -v LD_PRELOAD
+
+	date +"%d/%m/%Y %H:%M:%S"
+	printf "\t Warm-up\n"
+	stress-ng --cpu 100 -t 5 &> /tmp/time.stress
+	sed 's/^/\t/' /tmp/time.stress
+	printf "\n"
+
+	printf "\t Step: $step \n\n"
+
+	while IFS=\; read -r event mapping appA appB; do
+		date +"%d/%m/%Y %H:%M:%S"
+		printf "\t Event: $event \n"
+		printf "\t Mapping: $mapping \n"
+		printf "\t Application A: $appA \n"
+		printf "\t Application B: $appB \n\n"
+
+		PAPI_EVENT=$event $exec $appA,$appB $mapping B 1> /tmp/micro.time.out 2> /tmp/micro.time.err
+		
+		awk -v d="$host,$arch" -F"," 'BEGIN { OFS = "," } {print d, $0}' /tmp/micro.papi >> $output
+		[[ -s /tmp/micro.papi ]] || echo "error"
+		sed -i '1d' $doe
+	done < $doe
+
+	date +"%d/%m/%Y %H:%M:%S"
+	printf "\t done - $output \n\n"
+
+	rm $doe
+done

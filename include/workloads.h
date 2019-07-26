@@ -2,7 +2,7 @@
 	#define WORKLOADS_H
 	#define CACHE_LINE_SIZE 128
 	#define NWORKLOADS 23
-	#define PAPI_MAX_EVENTS 5
+	#define PAPI_MAX_EVENTS 1
 
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-variable"

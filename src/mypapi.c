@@ -74,6 +74,7 @@ void papi_thread_init(void *data){
 
 	for(i = 0; i < num_events; i++){
 		/* Add event from ENV */
+
 		retval = PAPI_add_named_event(t->EventSet1, list_events[i]);
 		if(retval != PAPI_OK)
 			error_handler_papi(__LINE__, "Trouble adding event", retval);
