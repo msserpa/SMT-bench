@@ -193,7 +193,6 @@ void thread_init(){
 		threads[i].iterations = 0;
 		threads[i].time = 0.0;
 		threads[i].tid = -1;
-		threads[i].event = NULL;
 		threads[i].EventSet1 = 0;
 		threads[i].value[0] = 0;
 		threads[i].value[1] = 0;

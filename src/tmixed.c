@@ -104,6 +104,7 @@ int main(int argc, char **argv){
 	for(i = 0; i < nt; i++)
 		pthread_join(ts[i], NULL);
 
+	/*
 	for(i = 0; i < nt; i++){
 		if(threads[i].typeA == MEMORY_LOAD_DEP)
 			free_list(&threads[i]);
@@ -111,6 +112,7 @@ int main(int argc, char **argv){
 			free_vec(&threads[i]);
 		
 	}
+	*/
 
 	selection_sort(threads, nt);
 

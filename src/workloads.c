@@ -1582,7 +1582,10 @@ void memory_store_random(thread_data_t *t){
 	t->v2 = jump;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void workload_idle(thread_data_t *t){
 	printf("workload_idle\n");
 	__asm__ __volatile__ ("pause");
 }
+#pragma GCC diagnostic pop

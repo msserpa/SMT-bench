@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <unistd.h>
 #include "../include/mypapi.h"
 #include "../include/workloads.h"
@@ -14,6 +15,8 @@ extern uint32_t papi_enabled;
 static FILE *fpapi = NULL;
 extern char *map;
 static spinlock_t threads_lock = SPINLOCK_INIT;
+static char **list_events = NULL;
+static uint32_t num_events = 0;
 
 /* Use a positive value of retval to simply print an error message */
 void error_handler_papi(int line, const char *call, int retval){
@@ -40,10 +43,24 @@ void papi_init(){
 		error_handler_papi(__LINE__, "PAPI_thread_init", retval);
 
 	system("rm -f /tmp/micro.papi &> /dev/null");
+
+	/* Get environment variable */
+	list_events = (char **) calloc(PAPI_MAX_EVENTS, sizeof(char *));
+	char *str;
+	str = strtok(getenv("PAPI_EVENT"),",");
+	while(str != NULL){
+		list_events[num_events] = (char *) calloc(strlen(str) + 1, sizeof(char));
+		strcpy(list_events[num_events++], str);
+		str = strtok(NULL, ",");
+		if(num_events > PAPI_MAX_EVENTS)
+			error_handler_papi(__LINE__, "Maximum number of PAPI events reached", 1);
+	}
+	list_events = (char **) realloc(list_events, num_events * sizeof(char *));
 }
 
 void papi_thread_init(void *data){
 	thread_data_t *t = (thread_data_t*)data;
+	uint32_t i;
 
 	t->EventSet1 = PAPI_NULL;
 
@@ -52,65 +69,65 @@ void papi_thread_init(void *data){
 	if(retval != PAPI_OK)
 		error_handler_papi(__LINE__, "PAPI_create_eventset", retval);
 
-	/* Get environment variable */
-	t->event = getenv("PAPI_EVENT");
-	if(t->event == NULL)
+	if(list_events[0] == NULL)
 		error_handler_papi(__LINE__, "PAPI_EVENT is not defined", 1);
 
-	/* Add event from ENV */
-	retval = PAPI_add_named_event(t->EventSet1, t->event);
-	if(retval != PAPI_OK)
-		error_handler_papi(__LINE__, "Trouble adding event", retval);
+	for(i = 0; i < num_events; i++){
+		/* Add event from ENV */
+		retval = PAPI_add_named_event(t->EventSet1, list_events[i]);
+		if(retval != PAPI_OK)
+			error_handler_papi(__LINE__, "Trouble adding event", retval);
 
-	int eventCode;
+		int eventCode;
 
-	retval = PAPI_event_name_to_code(t->event, &eventCode);
-	if(retval != PAPI_OK){
-		switch(retval){
-			case PAPI_EINVAL: 
-				error_handler_papi(__LINE__, "One or more of the arguments is invalid", retval);
-			break;
-			case PAPI_ENOTPRESET:
-				error_handler_papi(__LINE__, "The hardware event specified is not a valid PAPI preset", retval);
-			break;
-			case PAPI_ENOEVNT:
-				error_handler_papi(__LINE__, "The PAPI preset is not available on the underlying hardware", retval);
-			break;
-			case PAPI_ENOINIT:
-				error_handler_papi(__LINE__, "The PAPI library has not been initialized", retval);
-			break;
-			default:
-				error_handler_papi(__LINE__, "PAPI_event_name_to_code error", retval);
-		}
-	}
-
-	if(eventCode >= 0){
-		retval = PAPI_overflow(t->EventSet1, eventCode, INT_MAX, 0, (PAPI_overflow_handler_t) overflow_handler);
+		retval = PAPI_event_name_to_code(list_events[i], &eventCode);
 		if(retval != PAPI_OK){
 			switch(retval){
 				case PAPI_EINVAL: 
-					error_handler_papi(__LINE__, "One or more of the arguments is invalid. Specifically, a bad threshold value", retval);
+					error_handler_papi(__LINE__, "One or more of the arguments is invalid", retval);
 				break;
-				case PAPI_ENOMEM:
-					error_handler_papi(__LINE__, "Insufficient memory to complete the operation", retval);
-				break;
-				case PAPI_ENOEVST:
-					error_handler_papi(__LINE__, "The EventSet specified does not exist", retval);
-				break;
-				case PAPI_EISRUN:
-					error_handler_papi(__LINE__, "The EventSet is currently counting events", retval);
-				break;
-				case PAPI_ECNFLCT:
-					error_handler_papi(__LINE__, "The underlying counter hardware cannot count this event and other events in the EventSet simultaneously. Or you are trying to overflow both by hardware and by forced software at the same time", retval);
+				case PAPI_ENOTPRESET:
+					error_handler_papi(__LINE__, "The hardware event specified is not a valid PAPI preset", retval);
 				break;
 				case PAPI_ENOEVNT:
 					error_handler_papi(__LINE__, "The PAPI preset is not available on the underlying hardware", retval);
 				break;
 				case PAPI_ENOINIT:
 					error_handler_papi(__LINE__, "The PAPI library has not been initialized", retval);
-				break;  				
+				break;
 				default:
-					error_handler_papi(__LINE__, "PAPI_EVENT overflowed", retval);
+					error_handler_papi(__LINE__, "PAPI_event_name_to_code error", retval);
+			}
+		}
+
+		if(eventCode >= 0){
+			retval = PAPI_overflow(t->EventSet1, eventCode, INT_MAX, 0, (PAPI_overflow_handler_t) overflow_handler);
+			if(retval != PAPI_OK){
+				switch(retval){
+					case PAPI_EINVAL: 
+						error_handler_papi(__LINE__, "One or more of the arguments is invalid. Specifically, a bad threshold value", retval);
+					break;
+					case PAPI_ENOMEM:
+						error_handler_papi(__LINE__, "Insufficient memory to complete the operation", retval);
+					break;
+					case PAPI_ENOEVST:
+						error_handler_papi(__LINE__, "The EventSet specified does not exist", retval);
+					break;
+					case PAPI_EISRUN:
+						error_handler_papi(__LINE__, "The EventSet is currently counting events", retval);
+					break;
+					case PAPI_ECNFLCT:
+						error_handler_papi(__LINE__, "The underlying counter hardware cannot count this event and other events in the EventSet simultaneously. Or you are trying to overflow both by hardware and by forced software at the same time", retval);
+					break;
+					case PAPI_ENOEVNT:
+						error_handler_papi(__LINE__, "The PAPI preset is not available on the underlying hardware", retval);
+					break;
+					case PAPI_ENOINIT:
+						error_handler_papi(__LINE__, "The PAPI library has not been initialized", retval);
+					break;  				
+					default:
+						error_handler_papi(__LINE__, "PAPI_EVENT overflowed", retval);
+				}
 			}
 		}
 	}
@@ -123,6 +140,7 @@ void papi_thread_init(void *data){
 
 void papi_thread_finish(void *data){
 	thread_data_t *t = (thread_data_t*)data;
+	uint32_t i;
 
 	/* Stop PAPI */
 	int retval = PAPI_stop(t->EventSet1, t->value);
@@ -139,17 +157,20 @@ void papi_thread_finish(void *data){
 		error_handler_papi(__LINE__, "PAPI_destroy_eventset", retval);
 
 	/*remove underlines */
-	char *ptr = &t->event[0];
-	while(*ptr != '\0'){
-		if(*ptr == '_')
-			*ptr='-';
-		ptr++;
-	}
+	for(i = 0; i < num_events; i++){
+		char *ptr = list_events[i];
+		while(*ptr != '\0'){
+			if(*ptr == '_')
+				*ptr='-';
+			ptr++;
+		}
+	}	
 
 	spinlock_lock(&threads_lock);
 	fpapi = fopen("/tmp/micro.papi", "a");
 	assert(fpapi != NULL);
-	fprintf(fpapi, "%s,%s,%lu,%s,%lu,%s,%d,%lld\n", map, workload_name[t->typeA], t->memoryA, workload_name[t->typeB], t->memoryB, &t->event[0], t->cpu, t->value[0]);
+	for(i = 0; i < num_events; i++)
+		fprintf(fpapi, "%s,%s,%lu,%s,%lu,%s,%d,%lld\n", map, workload_name[t->typeA], t->memoryA, workload_name[t->typeB], t->memoryB, list_events[i], t->cpu, t->value[i]);
 	fclose(fpapi);
 	spinlock_unlock(&threads_lock);
 }

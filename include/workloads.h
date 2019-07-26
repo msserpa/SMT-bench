@@ -2,7 +2,8 @@
 	#define WORKLOADS_H
 	#define CACHE_LINE_SIZE 128
 	#define NWORKLOADS 23
-	
+	#define PAPI_MAX_EVENTS 5
+
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-variable"
 	static char *workload_name[] = {
@@ -74,9 +75,8 @@
 		double time;
 		pid_t tid;
 
-		char *event;
-		int EventSet1;
-		long long value[2];
+		int32_t EventSet1;
+		long long value[PAPI_MAX_EVENTS];
 
 		uint64_t v2;
 		list_t *ptr_list;
