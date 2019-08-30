@@ -47,7 +47,7 @@ while true; do
 
 	printf "\t Step: $step \n\n"
 
-	while IFS=; read -r mapping appA appB; do
+	while IFS=\; read -r mapping appA appB; do
 		grepA=`echo $appA | awk -F: '{printf "%s", $1} NF > 1{printf "-%sKB", $2} {printf ":"}'`
 		grepB=`echo $appB | awk -F: '{printf "%s", $1} NF > 1{printf "-%sKB", $2} {printf ":"}'`
 		
