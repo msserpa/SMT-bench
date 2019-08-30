@@ -6,7 +6,7 @@ declare -a MAPPING=("os" "homo" "hetero")
 declare -a APP=("ctl-complex" "dep-chain1" "fp-add" "fp-div" "fp-mul" "int-add" "int-div" "int-mul" "load-dep:16" "idle")
 #declare -a APP=("ctl-complex" "ctl-conditional" "ctl-random" "ctl-small-bbl" "ctl-switch" "dep-chain1" "dep-chain2" "dep-chain3" "dep-chain4" "dep-chain5" "dep-chain6" "fp-add" "fp-div" "fp-mul" "int-add" "int-div" "int-mul" "load-dep:16" "load-ind:16" "load-rand:16" "load-dep:8192" "load-ind:8192" "load-rand:8192" "idle")
 
-OUTPUT=./DoE/`hostname`.csv
+OUTPUT=./DoE/`hostname | awk -F. {'print $1'}`.csv
 rm -f $OUTPUT
 
 size=0
