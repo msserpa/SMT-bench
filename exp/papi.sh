@@ -2,7 +2,7 @@
 
 #set -o errexit -o nounset -o pipefail -o posix
 
-host=`hostname`
+host=`hostname | awk -F. {'print $1'}`
 arch=`gcc -march=native -Q --help=target | grep march | awk '{print $2}'`
 
 date +"%d/%m/%Y %H:%M:%S"
