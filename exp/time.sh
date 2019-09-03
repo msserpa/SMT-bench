@@ -9,7 +9,7 @@ date +"%d/%m/%Y %H:%M:%S"
 printf "\t Running on $arch@$host \n\n"
 
 date +"%d/%m/%Y %H:%M:%S"
-exec=mixed.$host
+exec=mixed.`hostname`
 make -C .. &> /tmp/time.make
 mv ../bin/$exec /tmp/$exec
 exec=/tmp/$exec
@@ -47,7 +47,7 @@ while true; do
 
 	printf "\t Step: $step \n\n"
 
-	while IFS=; read -r mapping appA appB; do
+	while IFS=\; read -r mapping appA appB; do
 		grepA=`echo $appA | awk -F: '{printf "%s", $1} NF > 1{printf "-%sKB", $2} {printf ":"}'`
 		grepB=`echo $appB | awk -F: '{printf "%s", $1} NF > 1{printf "-%sKB", $2} {printf ":"}'`
 		
