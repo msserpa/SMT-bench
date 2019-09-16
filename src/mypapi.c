@@ -171,6 +171,8 @@ void papi_thread_finish(void *data){
 	fpapi = fopen("/tmp/micro.papi", "a");
 	assert(fpapi != NULL);
 	for(i = 0; i < num_events; i++)
+		fprintf(stderr, "%s,%s,%lu,%s,%lu,%s,%d,%lld\n", map, workload_name[t->typeA], t->memoryA, workload_name[t->typeB], t->memoryB, list_events[i], t->cpu, t->value[i]);	
+	for(i = 0; i < num_events; i++)
 		fprintf(fpapi, "%s,%s,%lu,%s,%lu,%s,%d,%lld\n", map, workload_name[t->typeA], t->memoryA, workload_name[t->typeB], t->memoryB, list_events[i], t->cpu, t->value[i]);
 	fclose(fpapi);
 	spinlock_unlock(&threads_lock);

@@ -6,7 +6,7 @@
 #include "../include/workloads.h"
 
 extern thread_data_t *threads;
-extern uint32_t nt;
+extern uint32_t nt, nt_exec;
 uint64_t **iterations;
 
 void init_class(){
@@ -202,6 +202,7 @@ void init_class_B(){
 	iterations[EXECUTION_INT_ADD_IND][0] = 708815868;
 	iterations[EXECUTION_INT_DIV_IND][0] = 20738284;
 	iterations[EXECUTION_INT_MUL_IND][0] = 749736007;
+	
 	iterations[MEMORY_LOAD_DEP][0] = 2791178822; //16KB
 	iterations[MEMORY_LOAD_DEP][1] = 2520048062; //32KB
 	iterations[MEMORY_LOAD_DEP][2] = 1318790137; //64KB
@@ -241,7 +242,7 @@ void init_class_B(){
 	iterations[MEMORY_LOAD_RANDOM][10] = 0; //16384KB
 	iterations[MEMORY_LOAD_RANDOM][11] = 0; //32768KB
 	iterations[MEMORY_LOAD_RANDOM][12] = 0; //65536KB
-	iterations[MEMORY_STORE_IND][0] = 0; //16KB
+	iterations[MEMORY_STORE_IND][0] = 3594545828; //16KB
 	iterations[MEMORY_STORE_IND][1] = 0; //32KB
 	iterations[MEMORY_STORE_IND][2] = 0; //64KB
 	iterations[MEMORY_STORE_IND][3] = 0; //128KB
@@ -254,7 +255,7 @@ void init_class_B(){
 	iterations[MEMORY_STORE_IND][10] = 0; //16384KB
 	iterations[MEMORY_STORE_IND][11] = 0; //32768KB
 	iterations[MEMORY_STORE_IND][12] = 0; //65536KB
-	iterations[MEMORY_STORE_RANDOM][0] = 0; //16KB
+	iterations[MEMORY_STORE_RANDOM][0] = 5885559983; //16KB
 	iterations[MEMORY_STORE_RANDOM][1] = 0; //32KB
 	iterations[MEMORY_STORE_RANDOM][2] = 0; //64KB
 	iterations[MEMORY_STORE_RANDOM][3] = 0; //128KB
@@ -376,7 +377,7 @@ void set_workload_iterations(char class){
 	else
 		init_class();
 
-	for(i = 0; i < nt; i++){
+	for(i = 0; i < nt_exec; i++){
 		if(threads[i].memoryA <= (unsigned long int) powf(2, 12 + 4)){
 			if(threads[i].memoryA == 0)
 				threads[i].iterations = iterations[threads[i].typeA][0];

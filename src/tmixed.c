@@ -13,7 +13,7 @@
 uint32_t papi_enabled = 0;
 uint32_t os_enabled = 0;
 extern thread_data_t *threads;
-extern uint32_t nt;
+extern uint32_t nt, nt_exec;
 
 void swap(thread_data_t *A, thread_data_t *B){
     thread_data_t tmp = *A;
@@ -56,15 +56,17 @@ int main(int argc, char **argv){
 		fprintf(stderr, "\tC - 60 seconds\n");
 		exit(EXIT_FAILURE);
 	}
-	ts = malloc(nt * sizeof(pthread_t));
+	ts = malloc(nt_exec * sizeof(pthread_t));
 	assert(ts != NULL);
 
 	map_env(argv[2]);
 	parse_type_vector(argv[1], argv[3][0]);
 
-	if(getenv("OMP_NUM_THREADS"))
+	if(getenv("OMP_NUM_THREADS")){
 		nt = atoi(getenv("OMP_NUM_THREADS"));
-	else {
+		printf("nt=%d nt_exec=%d class=%c\n", nt, nt_exec, argv[3][0]);
+	}
+	else{
 		printf("missing OMP_NUM_THREADS\n");
 		exit(1);
 	}
@@ -78,7 +80,7 @@ int main(int argc, char **argv){
 	}
 
 	init_workload();
-	for(i = 0; i < nt; i++){
+	for(i = 0; i < nt_exec; i++){
 		if(threads[i].typeA == MEMORY_LOAD_DEP)
 			alloc_list(&threads[i]);
 		else if(threads[i].typeA == MEMORY_LOAD_IND || threads[i].typeA == MEMORY_LOAD_RANDOM || threads[i].typeA == MEMORY_STORE_IND || threads[i].typeA == MEMORY_STORE_RANDOM){
@@ -90,7 +92,7 @@ int main(int argc, char **argv){
 			printf("%s(%d)", workload_name[threads[i].typeA], threads[i].cpu);
 		else
 			printf("%s-%luKB(%d)", workload_name[threads[i].typeA], threads[i].memoryA, threads[i].cpu);
-		if(i < nt - 1)
+		if(i < nt_exec - 1)
 			printf(", ");
 	}
 	printf("\n\n");
@@ -98,10 +100,10 @@ int main(int argc, char **argv){
 	if(papi_enabled)
 		papi_init();
 
-	for(i = 0; i < nt; i++)
+	for(i = 0; i < nt_exec; i++)
 		pthread_create(&ts[i], NULL, pthreads_callback, &threads[i]);
 
-	for(i = 0; i < nt; i++)
+	for(i = 0; i < nt_exec; i++)
 		pthread_join(ts[i], NULL);
 
 	/*
@@ -114,7 +116,7 @@ int main(int argc, char **argv){
 	}
 	*/
 
-	selection_sort(threads, nt);
+	selection_sort(threads, nt_exec);
 
 	workload = threads[0].typeA;
 	memory = threads[0].memoryA;
@@ -122,7 +124,7 @@ int main(int argc, char **argv){
 	min = threads[0].time;
 	max = threads[0].time;
 	avg = threads[0].time;
-	for(i = 1; i < nt; i++){
+	for(i = 1; i < nt_exec; i++){
 		if(threads[i].typeA == workload && threads[i].memoryA == memory){
 			avg += threads[i].time;
 			max = threads[i].time;
