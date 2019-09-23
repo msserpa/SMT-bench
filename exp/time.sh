@@ -9,7 +9,7 @@ date +"%d/%m/%Y %H:%M:%S"
 printf "\t Running on $arch@$host \n\n"
 
 date +"%d/%m/%Y %H:%M:%S"
-exec=mixed.$host
+exec=mixed.`hostname`
 make -C .. &> /tmp/time.make
 mv ../bin/$exec /tmp/$exec
 exec=/tmp/$exec
@@ -47,7 +47,7 @@ while true; do
 
 	printf "\t Step: $step \n\n"
 
-	while IFS=; read -r mapping appA appB; do
+	while IFS=\; read -r mapping appA appB; do
 		grepA=`echo $appA | awk -F: '{printf "%s", $1} NF > 1{printf "-%sKB", $2} {printf ":"}'`
 		grepB=`echo $appB | awk -F: '{printf "%s", $1} NF > 1{printf "-%sKB", $2} {printf ":"}'`
 		
@@ -55,27 +55,27 @@ while true; do
 		printf "\t Mapping: $mapping \n"
 		printf "\t Application A: $appA \n"
 		printf "\t Application B: $appB \n\n"
-		$exec $appA,$appB $mapping B 1> /tmp/micro.time.out 2> /tmp/micro.time.err
+		OMP_NUM_THREADS=2 $exec $appA,$appB $mapping B 1> /tmp/micro.time.out 2> /tmp/micro.time.err
 		
-		if [ "$appA" == "$appB" ]; then
-			perfAmin=`cat /tmp/micro.time.err | grep $grepA\min | awk -F: {'printf "%f", $3 / 2.0'}`
-			perfAmax=`cat /tmp/micro.time.err | grep $grepA\max | awk -F: {'printf "%f", $3 / 2.0'}`
-			perfAavg=`cat /tmp/micro.time.err | grep $grepA\avg | awk -F: {'printf "%f", $3 / 2.0'}`
+#		if [ "$appA" == "$appB" ]; then
+#			perfAmin=`cat /tmp/micro.time.err | grep $grepA\min | awk -F: {'printf "%f", $3 / 2.0'}`
+#			perfAmax=`cat /tmp/micro.time.err | grep $grepA\max | awk -F: {'printf "%f", $3 / 2.0'}`
+#			perfAavg=`cat /tmp/micro.time.err | grep $grepA\avg | awk -F: {'printf "%f", $3 / 2.0'}`
 
-			perfBmin=`cat /tmp/micro.time.err | grep $grepB\min | awk -F: {'printf "%f", $3 / 2.0'}`
-			perfBmax=`cat /tmp/micro.time.err | grep $grepB\max | awk -F: {'printf "%f", $3 / 2.0'}`
-			perfBavg=`cat /tmp/micro.time.err | grep $grepB\avg | awk -F: {'printf "%f", $3 / 2.0'}`
-		else
+#			perfBmin=`cat /tmp/micro.time.err | grep $grepB\min | awk -F: {'printf "%f", $3 / 2.0'}`
+#			perfBmax=`cat /tmp/micro.time.err | grep $grepB\max | awk -F: {'printf "%f", $3 / 2.0'}`
+#			perfBavg=`cat /tmp/micro.time.err | grep $grepB\avg | awk -F: {'printf "%f", $3 / 2.0'}`
+#		else
 			perfAmin=`cat /tmp/micro.time.err | grep $grepA\min | awk -F: {'printf "%f", $3'}`
 			perfAmax=`cat /tmp/micro.time.err | grep $grepA\max | awk -F: {'printf "%f", $3'}`
 			perfAavg=`cat /tmp/micro.time.err | grep $grepA\avg | awk -F: {'printf "%f", $3'}`
 
-			perfBmin=`cat /tmp/micro.time.err | grep $grepB\min | awk -F: {'printf "%f", $3'}`
-			perfBmax=`cat /tmp/micro.time.err | grep $grepB\max | awk -F: {'printf "%f", $3'}`
-			perfBavg=`cat /tmp/micro.time.err | grep $grepB\avg | awk -F: {'printf "%f", $3'}`
-		fi
+#			perfBmin=`cat /tmp/micro.time.err | grep $grepB\min | awk -F: {'printf "%f", $3'}`
+#			perfBmax=`cat /tmp/micro.time.err | grep $grepB\max | awk -F: {'printf "%f", $3'}`
+#			perfBavg=`cat /tmp/micro.time.err | grep $grepB\avg | awk -F: {'printf "%f", $3'}`
+#		fi
 		echo $host,$arch,$mapping,$appA,$appB,$perfAmin,$perfAmax,$perfAavg >> $output
-		echo $host,$arch,$mapping,$appB,$appA,$perfBmin,$perfBmax,$perfBavg >> $output
+#		echo $host,$arch,$mapping,$appB,$appA,$perfBmin,$perfBmax,$perfBavg >> $output
 		sed -i '1d' $doe
 		[[ -s /tmp/micro.time.err ]] || echo "error"
 	done < $doe
