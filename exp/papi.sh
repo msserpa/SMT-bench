@@ -9,7 +9,7 @@ date +"%d/%m/%Y %H:%M:%S"
 printf "\t Running on $arch@$host \n\n"
 
 date +"%d/%m/%Y %H:%M:%S"
-exec=mixed.$host
+exec=mixed.`hostname`
 make -C .. &> /tmp/time.make
 mv ../bin/$exec /tmp/$exec
 exec=/tmp/$exec

@@ -10,6 +10,7 @@
 extern thread_data_t *threads;
 extern uint32_t os_enabled;
 extern uint32_t nt;
+extern uint32_t nt_exec;
 char *map, *env_omp, *env_mapping;
 
 void error_handler(const char *call, const int line){
@@ -47,6 +48,11 @@ void map_threads(){
 	}
 	free(line);
 
+	if(getenv("OMP_NUM_THREADS"))
+		nt_exec = atoi(getenv("OMP_NUM_THREADS"));
+	else
+		nt_exec = nt;
+
 	env_omp = (char *) calloc(BUFFER_SIZE,  sizeof(char));
 	sprintf(env_omp, "OMP_NUM_THREADS=%d", nt);
 
@@ -83,7 +89,7 @@ void map_heterogeneous(){
 		sprintf(&env_heterogeneous[strlen(env_heterogeneous)], "%d,", app_heterogeneous[i]);
 	sprintf(&env_heterogeneous[strlen(env_heterogeneous)], "%d", app_heterogeneous[nt - 1]);
 	
-	for(i = 0; i < nt; i++)
+	for(i = 0; i < nt_exec; i++)
 		threads[i].cpu = app_heterogeneous[i];
 
 	env_heterogeneous = (char *) realloc(env_heterogeneous, (strlen(env_heterogeneous) + 1) * sizeof(char));
@@ -135,7 +141,7 @@ void map_homogeneos(){
 		sprintf(&env_homogeneos[strlen(env_homogeneos)], "%d,", app_homogeneos[i]);
 	sprintf(&env_homogeneos[strlen(env_homogeneos)], "%d", app_homogeneos[nt - 1]);
 
-	for(i = 0; i < nt; i++)
+	for(i = 0; i < nt_exec; i++)
 		threads[i].cpu = app_homogeneos[i];
 
 	env_homogeneos = (char *) realloc(env_homogeneos, (strlen(env_homogeneos) + 1) * sizeof(char));
@@ -169,7 +175,7 @@ void map_random(){
 		sprintf(&env_random[strlen(env_random)], "%d,", app_random[i]);
 	sprintf(&env_random[strlen(env_random)], "%d", app_random[nt - 1]);
 
-	for(i = 0; i < nt; i++)
+	for(i = 0; i < nt_exec; i++)
 		threads[i].cpu = app_random[i];
 
 	env_random = (char *) realloc(env_random, (strlen(env_random) + 1) * sizeof(char));
@@ -183,14 +189,13 @@ void map_random(){
 void thread_init(){
 	uint32_t i;
 
-	threads = (thread_data_t *) malloc(nt * sizeof(thread_data_t));
+	threads = (thread_data_t *) malloc(nt_exec * sizeof(thread_data_t));
 	assert(threads != NULL);
 	
-	for(i = 0; i < nt; i++){
+	for(i = 0; i < nt_exec; i++){
 		threads[i].typeA = WORKLOAD_IDLE;
 		threads[i].typeB = WORKLOAD_IDLE;
 		threads[i].cpu = -1;
-		threads[i].iterations = 0;
 		threads[i].time = 0.0;
 		threads[i].tid = -1;
 		threads[i].EventSet1 = 0;

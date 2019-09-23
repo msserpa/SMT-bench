@@ -18,7 +18,7 @@
 #include "../include/workloads.h"
 
 thread_data_t *threads = NULL;
-uint32_t nt = 0;
+uint32_t nt = 0, nt_exec = 0;
 extern uint32_t papi_enabled;
 extern uint32_t os_enabled;
 
@@ -141,7 +141,7 @@ void parse_type_vector(const char *argv, char class){
 	free(str);
 	assert(i == n);
 
-	for(i = 0; i < nt; i++){
+	for(i = 0; i < nt_exec; i++){
 		threads[i].typeA  = workload[i % n];
 		threads[i].memoryA = memory[i % n];
 		threads[i].typeB = workload[(i + 1) % n];
