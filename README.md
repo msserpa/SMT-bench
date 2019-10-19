@@ -4,10 +4,6 @@ This software is made available using the GNU General Public License v3.0 licens
 
 ## Dependencies
 
-* Intel® Parallel Studio XE
-
-  Download at <https://software.intel.com/en-us/parallel-studio-xe>
-
 * PAPI: Performance Application Programming Interface
 
   Download at <http://icl.utk.edu/papi>
