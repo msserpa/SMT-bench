@@ -44,7 +44,7 @@ int main(int argc, char **argv){
 	pthread_t *ts = NULL;
 
 	if(argc != 4){
-		uint64_t line_breaks[] = {4, 10, 16, 19, 21, 22, 24, 28, 31, 33, 36, 39, 42, 45, 48, 51, 54, 63, 0};
+		uint64_t line_breaks[] = {4, 10, 13, 16, 19, 21, 22, 24, 25, 28, 31, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 65, 0};
 
 		fprintf(stderr, "Usage: %s <workloads-comma-separed> <os | heterogeneous | homogeneos | random> <time_in_seconds>\n", argv[0]);
 		fprintf(stderr, "Workloads list:\n\t");
