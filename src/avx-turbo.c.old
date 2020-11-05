@@ -1,0 +1,127 @@
+#include <cstdio>
+#include <cstdint>
+#include <omp.h>
+
+typedef void (cal_f)(uint64_t iters);
+
+enum ISA {
+    BASE     = 1 << 0,
+    AVX2     = 1 << 1,
+    AVX512F  = 1 << 2, // note: does not imply VL, so xmm and ymm may not be available
+    AVX512VL = 1 << 3, // note: does not imply F, although i don't know any CPU with VL but not F
+    AVX512CD = 1 << 4,
+    AVX512BW = 1 << 5,
+};
+
+#define FUNCS_X(x)                                              \
+    x(pause_only          , "pause instruction"               ) \
+    x(ucomis_clean        , "scalar ucomis (w/ vzeroupper)"   ) \
+    x(ucomis_dirty        , "scalar ucomis (no vzeroupper)"   ) \
+                                                                \
+    /* iadd */                                                  \
+    x(scalar_iadd         , "Scalar integer adds"             ) \
+    x(avx128_iadd         , "128-bit integer serial adds"     ) \
+    x(avx256_iadd         , "256-bit integer serial adds"     ) \
+    x(avx512_iadd         , "512-bit integer serial adds"     ) \
+                                                                \
+    x(avx128_iadd16     , "128-bit integer serial adds zmm16" ) \
+    x(avx256_iadd16     , "256-bit integer serial adds zmm16" ) \
+    x(avx512_iadd16     , "512-bit integer serial adds zmm16" ) \
+                                                                \
+    /* iadd throughput */                                       \
+    x(avx128_iadd_t       , "128-bit integer parallel adds"   ) \
+    x(avx256_iadd_t       , "256-bit integer parallel adds"   ) \
+                                                                \
+    /* reg-reg mov */                                           \
+    x(avx128_mov_sparse   , "128-bit reg-reg mov"             ) \
+    x(avx256_mov_sparse   , "256-bit reg-reg mov"             ) \
+    x(avx512_mov_sparse   , "512-bit reg-reg mov"             ) \
+                                                                \
+    /* merge */                                                 \
+    x(avx128_merge_sparse , "128-bit reg-reg merge mov"       ) \
+    x(avx256_merge_sparse , "256-bit reg-reg merge mov"       ) \
+    x(avx512_merge_sparse , "512-bit reg-reg merge mov"       ) \
+                                                                \
+    /* variable shift latency */                                \
+    x(avx128_vshift       , "128-bit variable shift (vpsrlvd)") \
+    x(avx256_vshift       , "256-bit variable shift (vpsrlvd)") \
+    x(avx512_vshift       , "512-bit variable shift (vpsrlvd)") \
+    /* variable shift throughput */                             \
+    x(avx128_vshift_t     , "128-bit variable shift (vpsrlvd)") \
+    x(avx256_vshift_t     , "256-bit variable shift (vpsrlvd)") \
+    x(avx512_vshift_t     , "512-bit variable shift (vpsrlvd)") \
+                                                                \
+    /* vplzcntd latency */                                      \
+    x(avx128_vlzcnt       , "128-bit lzcnt (vplzcntd)",       ) \
+    x(avx256_vlzcnt       , "256-bit lzcnt (vplzcntd)",       ) \
+    x(avx512_vlzcnt       , "512-bit lzcnt (vplzcntd)",       ) \
+    /* vplzcntd throughput */                                   \
+    x(avx128_vlzcnt_t     , "128-bit lzcnt (vplzcntd)",       ) \
+    x(avx256_vlzcnt_t     , "256-bit lzcnt (vplzcntd)",       ) \
+    x(avx512_vlzcnt_t     , "512-bit lzcnt (vplzcntd)",       ) \
+                                                                \
+    x(avx128_imul         , "128-bit integer muls (vpmuldq)"  ) \
+    x(avx256_imul         , "256-bit integer muls (vpmuldq)"  ) \
+    x(avx512_imul         , "512-bit integer muls (vpmuldq)"  ) \
+                                                                \
+    /* fma */                                                   \
+    x(avx128_fma_sparse   , "128-bit 64-bit sparse FMAs"      ) \
+    x(avx256_fma_sparse   , "256-bit 64-bit sparse FMAs"      ) \
+    x(avx512_fma_sparse   , "512-bit 64-bit sparse FMAs"      ) \
+    x(avx128_fma          , "128-bit serial DP FMAs"          ) \
+    x(avx256_fma          , "256-bit serial DP FMAs"          ) \
+    x(avx512_fma          , "512-bit serial DP FMAs"          ) \
+    x(avx128_fma_t        , "128-bit parallel DP FMAs"        ) \
+    x(avx256_fma_t        , "256-bit parallel DP FMAs"        ) \
+    x(avx512_fma_t        , "512-bit parallel DP FMAs"        ) \
+                                                                \
+    x(avx512_vpermw       , "512-bit serial WORD permute"     ) \
+    x(avx512_vpermw_t     , "512-bit parallel WORD permute"   ) \
+    x(avx512_vpermd       , "512-bit serial DWORD permute"    ) \
+    x(avx512_vpermd_t     , "512-bit parallel DWORD permute"  ) \
+
+
+#define DECLARE(f,...) cal_f f;
+
+extern "C" {
+// functions declared in asm-methods.asm
+FUNCS_X(DECLARE);
+
+// lembrar de verificar se alguma dessas é chamada no programa 
+
+// misc helpers
+void zeroupper_asm();
+
+static bool zeroupper_allowed;
+
+void zeroupper() {
+    if (zeroupper_allowed) zeroupper_asm();
+}
+
+// dirties zmm15 upper bits
+void dirty_it();
+// dirties zmm15 upper bits
+void dirty_it16();
+}
+
+int main(){
+    printf("oi\n");
+
+    double start = omp_get_wtime();
+#pragma omp parallel
+    avx128_fma_t(1E10);
+    printf("avx128_fma = %.1lf\n", omp_get_wtime() - start);
+
+    start = omp_get_wtime();
+#pragma omp parallel
+    avx256_fma_t(1E10);
+    printf("avx256_fma = %.1lf\n", omp_get_wtime() - start);
+    
+    start = omp_get_wtime();
+#pragma omp parallel
+    avx512_fma_t(1E10);
+    printf("avx512_fma = %.1lf\n", omp_get_wtime() - start);
+
+    printf("tchau\n");
+    return 0;
+}

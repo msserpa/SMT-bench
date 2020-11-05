@@ -1,7 +1,7 @@
 #ifndef WORKLOADS_H
 	#define WORKLOADS_H
 	#define CACHE_LINE_SIZE 128
-	#define NWORKLOADS 23
+	#define NWORKLOADS 68
 	#define PAPI_MAX_EVENTS 1
 
 	#pragma GCC diagnostic push
@@ -29,7 +29,52 @@
 		"load-rand",
 		"store-ind",
 		"store-rand",
-		"idle"
+		"idle",
+		"ucomis_clean",
+		"ucomis_dirty",
+		"scalar_iadd",
+		"avx128_iadd",
+		"avx256_iadd",
+		"avx512_iadd",
+		"avx128_iadd16",
+		"avx256_iadd16",
+		"avx512_iadd16",
+		"avx128_iadd_t",
+		"avx256_iadd_t",
+		"avx128_mov_sparse",
+		"avx256_mov_sparse",
+		"avx512_mov_sparse",
+		"avx128_merge_sparse",
+		"avx256_merge_sparse",
+		"avx512_merge_sparse",
+		"avx128_vshift",
+		"avx256_vshift",
+		"avx512_vshift",
+		"avx128_vshift_t",
+		"avx256_vshift_t",
+		"avx512_vshift_t",
+		"avx128_vlzcnt",
+		"avx256_vlzcnt",
+		"avx512_vlzcnt",
+		"avx128_vlzcnt_t",
+		"avx256_vlzcnt_t",
+		"avx512_vlzcnt_t",
+		"avx128_imul",
+		"avx256_imul",
+		"avx512_imul",
+		"avx128_fma_sparse",
+		"avx256_fma_sparse",
+		"avx512_fma_sparse",
+		"avx128_fma",
+		"avx256_fma",
+		"avx512_fma",
+		"avx128_fma_t",
+		"avx256_fma_t",
+		"avx512_fma_t",
+		"avx512_vpermw",
+		"avx512_vpermw_t",
+		"avx512_vpermd",
+		"avx512_vpermd_t"
 	};
 	#pragma GCC diagnostic pop
 
@@ -56,7 +101,52 @@
 		MEMORY_LOAD_RANDOM,
 		MEMORY_STORE_IND,
 		MEMORY_STORE_RANDOM,
-		WORKLOAD_IDLE
+		WORKLOAD_IDLE,
+		UCOMIS_CLEAN,
+		UCOMIS_DIRTY,
+		SCALAR_IADD,
+		AVX128_IADD,
+		AVX256_IADD,
+		AVX512_IADD,
+		AVX128_IADD16,
+		AVX256_IADD16,
+		AVX512_IADD16,
+		AVX128_IADD_T,
+		AVX256_IADD_T,
+		AVX128_MOV_SPARSE,
+		AVX256_MOV_SPARSE,
+		AVX512_MOV_SPARSE,
+		AVX128_MERGE_SPARSE,
+		AVX256_MERGE_SPARSE,
+		AVX512_MERGE_SPARSE,
+		AVX128_VSHIFT,
+		AVX256_VSHIFT,
+		AVX512_VSHIFT,
+		AVX128_VSHIFT_T,
+		AVX256_VSHIFT_T,
+		AVX512_VSHIFT_T,
+		AVX128_VLZCNT,
+		AVX256_VLZCNT,
+		AVX512_VLZCNT,
+		AVX128_VLZCNT_T,
+		AVX256_VLZCNT_T,
+		AVX512_VLZCNT_T,
+		AVX128_IMUL,
+		AVX256_IMUL,
+		AVX512_IMUL,
+		AVX128_FMA_SPARSE,
+		AVX256_FMA_SPARSE,
+		AVX512_FMA_SPARSE,
+		AVX128_FMA,
+		AVX256_FMA,
+		AVX512_FMA,
+		AVX128_FMA_T,
+		AVX256_FMA_T,
+		AVX512_FMA_T,
+		AVX512_VPERMW,
+		AVX512_VPERMW_T,
+		AVX512_VPERMD,
+		AVX512_VPERMD_T
 	}workload_t;
 
 	typedef struct list_t{
@@ -85,11 +175,6 @@
 	}  __attribute__ ((aligned (CACHE_LINE_SIZE))) thread_data_t;
 
 	void (*work[NWORKLOADS]) (thread_data_t *t);
-	void init_class();
-	void init_class_A();
-	void init_class_B();
-	void init_class_C();
-	void set_workload_iterations(char class);
 	void init_workload();
 	void control_complex(thread_data_t *t);
 	void control_conditional(thread_data_t *t);
@@ -119,4 +204,49 @@
 	void memory_store_ind(thread_data_t *t);
 	void memory_store_random(thread_data_t *t);
 	void workload_idle(thread_data_t *t);
+	void h_ucomis_clean(thread_data_t *t);
+	void h_ucomis_dirty(thread_data_t *t);
+	void h_scalar_iadd(thread_data_t *t);
+	void h_avx128_iadd(thread_data_t *t);
+	void h_avx256_iadd(thread_data_t *t);
+	void h_avx512_iadd(thread_data_t *t);
+	void h_avx128_iadd16(thread_data_t *t);
+	void h_avx256_iadd16(thread_data_t *t);
+	void h_avx512_iadd16(thread_data_t *t);
+	void h_avx128_iadd_t(thread_data_t *t);
+	void h_avx256_iadd_t(thread_data_t *t);
+	void h_avx128_mov_sparse(thread_data_t *t);
+	void h_avx256_mov_sparse(thread_data_t *t);
+	void h_avx512_mov_sparse(thread_data_t *t);
+	void h_avx128_merge_sparse(thread_data_t *t);
+	void h_avx256_merge_sparse(thread_data_t *t);
+	void h_avx512_merge_sparse(thread_data_t *t);
+	void h_avx128_vshift(thread_data_t *t);
+	void h_avx256_vshift(thread_data_t *t);
+	void h_avx512_vshift(thread_data_t *t);
+	void h_avx128_vshift_t(thread_data_t *t);
+	void h_avx256_vshift_t(thread_data_t *t);
+	void h_avx512_vshift_t(thread_data_t *t);
+	void h_avx128_vlzcnt(thread_data_t *t);
+	void h_avx256_vlzcnt(thread_data_t *t);
+	void h_avx512_vlzcnt(thread_data_t *t);
+	void h_avx128_vlzcnt_t(thread_data_t *t);
+	void h_avx256_vlzcnt_t(thread_data_t *t);
+	void h_avx512_vlzcnt_t(thread_data_t *t);
+	void h_avx128_imul(thread_data_t *t);
+	void h_avx256_imul(thread_data_t *t);
+	void h_avx512_imul(thread_data_t *t);
+	void h_avx128_fma_sparse(thread_data_t *t);
+	void h_avx256_fma_sparse(thread_data_t *t);
+	void h_avx512_fma_sparse(thread_data_t *t);
+	void h_avx128_fma(thread_data_t *t);
+	void h_avx256_fma(thread_data_t *t);
+	void h_avx512_fma(thread_data_t *t);
+	void h_avx128_fma_t(thread_data_t *t);
+	void h_avx256_fma_t(thread_data_t *t);
+	void h_avx512_fma_t(thread_data_t *t);
+	void h_avx512_vpermw(thread_data_t *t);
+	void h_avx512_vpermw_t(thread_data_t *t);
+	void h_avx512_vpermd(thread_data_t *t);
+	void h_avx512_vpermd_t(thread_data_t *t);
 #endif

@@ -4,394 +4,115 @@
 #include <math.h>
 #include "../include/mixed.h"
 #include "../include/workloads.h"
+#include <omp.h>
 
 extern thread_data_t *threads;
 extern uint32_t nt, nt_exec;
-uint64_t **iterations;
+extern int alive;
 
-void init_class(){
-	printf("init_class\n");
-	iterations[CONTROL_COMPLEX][0] = 3545750420/20;
-	iterations[CONTROL_CONDITIONAL][0] = 3559666634/20;
-	iterations[CONTROL_RANDOM][0] = 166313500/20;
-	iterations[CONTROL_SMALL_BBL][0] = 4312068293/20;
-	iterations[CONTROL_SWITCH][0] = 4145062272/20;
-	iterations[DEPENDENCY_CHAIN1][0] = 134491917/20;
-	iterations[DEPENDENCY_CHAIN2][0] = 269507186/20;
-	iterations[DEPENDENCY_CHAIN3][0] = 420045244/20;
-	iterations[DEPENDENCY_CHAIN4][0] = 534170738/20;
-	iterations[DEPENDENCY_CHAIN5][0] = 620024682/20;
-	iterations[DEPENDENCY_CHAIN6][0] = 701546406/20;
-	iterations[EXECUTION_FP_ADD_IND][0] = 808655722/20;
-	iterations[EXECUTION_FP_DIV_IND][0] = 100786069/20;
-	iterations[EXECUTION_FP_MUL_IND][0] = 1293847285/20;
-	iterations[EXECUTION_INT_ADD_IND][0] = 708815868/20;
-	iterations[EXECUTION_INT_DIV_IND][0] = 20738284/20;
-	iterations[EXECUTION_INT_MUL_IND][0] = 749736007/20;
-	iterations[MEMORY_LOAD_DEP][0] = 2791178822/20; //16KB
-	iterations[MEMORY_LOAD_DEP][1] = 2520048062/20; //32KB
-	iterations[MEMORY_LOAD_DEP][2] = 1318790137/20; //64KB
-	iterations[MEMORY_LOAD_DEP][3] = 0; //128KB
-	iterations[MEMORY_LOAD_DEP][4] = 0; //256KB
-	iterations[MEMORY_LOAD_DEP][5] = 0; //512KB
-	iterations[MEMORY_LOAD_DEP][6] = 0; //1024KB
-	iterations[MEMORY_LOAD_DEP][7] = 0; //2048KB
-	iterations[MEMORY_LOAD_DEP][8] = 0; //4096KB
-	iterations[MEMORY_LOAD_DEP][9] = 280192409/20; //8192KB
-	iterations[MEMORY_LOAD_DEP][10] = 0; //16384KB
-	iterations[MEMORY_LOAD_DEP][11] = 0; //32768KB
-	iterations[MEMORY_LOAD_DEP][12] = 0; //65536KB
-	iterations[MEMORY_LOAD_IND][0] = 3594545828/20; //16KB
-	iterations[MEMORY_LOAD_IND][1] = 3589516492/20; //32KB
-	iterations[MEMORY_LOAD_IND][2] = 3586875394/20; //64KB
-	iterations[MEMORY_LOAD_IND][3] = 0; //128KB
-	iterations[MEMORY_LOAD_IND][4] = 0; //256KB
-	iterations[MEMORY_LOAD_IND][5] = 0; //512KB
-	iterations[MEMORY_LOAD_IND][6] = 0; //1024KB
-	iterations[MEMORY_LOAD_IND][7] = 0; //2048KB
-	iterations[MEMORY_LOAD_IND][8] = 0; //4096KB
-	iterations[MEMORY_LOAD_IND][9] = 3560960462/20; //8192KB
-	iterations[MEMORY_LOAD_IND][10] = 0; //16384KB
-	iterations[MEMORY_LOAD_IND][11] = 0; //32768KB
-	iterations[MEMORY_LOAD_IND][12] = 0; //65536KB
-	iterations[MEMORY_LOAD_RANDOM][0] = 5885559983/20; //16KB
-	iterations[MEMORY_LOAD_RANDOM][1] = 5848185979/20; //32KB
-	iterations[MEMORY_LOAD_RANDOM][2] = 5423904255/20; //64KB
-	iterations[MEMORY_LOAD_RANDOM][3] = 0; //128KB
-	iterations[MEMORY_LOAD_RANDOM][4] = 0; //256KB
-	iterations[MEMORY_LOAD_RANDOM][5] = 0; //512KB
-	iterations[MEMORY_LOAD_RANDOM][6] = 0; //1024KB
-	iterations[MEMORY_LOAD_RANDOM][7] = 0; //2048KB
-	iterations[MEMORY_LOAD_RANDOM][8] = 0; //4096KB
-	iterations[MEMORY_LOAD_RANDOM][9] = 559947559/20; //8192KB
-	iterations[MEMORY_LOAD_RANDOM][10] = 0; //16384KB
-	iterations[MEMORY_LOAD_RANDOM][11] = 0; //32768KB
-	iterations[MEMORY_LOAD_RANDOM][12] = 0; //65536KB
-	iterations[MEMORY_STORE_IND][0] = 0; //16KB
-	iterations[MEMORY_STORE_IND][1] = 0; //32KB
-	iterations[MEMORY_STORE_IND][2] = 0; //64KB
-	iterations[MEMORY_STORE_IND][3] = 0; //128KB
-	iterations[MEMORY_STORE_IND][4] = 0; //256KB
-	iterations[MEMORY_STORE_IND][5] = 0; //512KB
-	iterations[MEMORY_STORE_IND][6] = 0; //1024KB
-	iterations[MEMORY_STORE_IND][7] = 0; //2048KB
-	iterations[MEMORY_STORE_IND][8] = 0; //4096KB
-	iterations[MEMORY_STORE_IND][9] = 0; //8192KB
-	iterations[MEMORY_STORE_IND][10] = 0; //16384KB
-	iterations[MEMORY_STORE_IND][11] = 0; //32768KB
-	iterations[MEMORY_STORE_IND][12] = 0; //65536KB
-	iterations[MEMORY_STORE_RANDOM][0] = 0; //16KB
-	iterations[MEMORY_STORE_RANDOM][1] = 0; //32KB
-	iterations[MEMORY_STORE_RANDOM][2] = 0; //64KB
-	iterations[MEMORY_STORE_RANDOM][3] = 0; //128KB
-	iterations[MEMORY_STORE_RANDOM][4] = 0; //256KB
-	iterations[MEMORY_STORE_RANDOM][5] = 0; //512KB
-	iterations[MEMORY_STORE_RANDOM][6] = 0; //1024KB
-	iterations[MEMORY_STORE_RANDOM][7] = 0; //2048KB
-	iterations[MEMORY_STORE_RANDOM][8] = 0; //4096KB
-	iterations[MEMORY_STORE_RANDOM][9] = 0; //8192KB
-	iterations[MEMORY_STORE_RANDOM][10] = 0; //16384KB
-	iterations[MEMORY_STORE_RANDOM][11] = 0; //32768KB
-	iterations[MEMORY_STORE_RANDOM][12] = 0; //65536KB
-	iterations[WORKLOAD_IDLE][0] = 0;
+/* Lines from 12 to 112 - Source: https://github.com/travisdowns/avx-turbo  */
+
+typedef void (cal_f)(uint64_t iters);
+
+enum ISA {
+    BASE     = 1 << 0,
+    AVX2     = 1 << 1,
+    AVX512F  = 1 << 2, // note: does not imply VL, so xmm and ymm may not be available
+    AVX512VL = 1 << 3, // note: does not imply F, although i don't know any CPU with VL but not F
+    AVX512CD = 1 << 4,
+    AVX512BW = 1 << 5,
+};
+
+#define FUNCS_X(x)                                              \
+    x(pause_only          , "pause instruction"               ) \
+    x(ucomis_clean        , "scalar ucomis (w/ vzeroupper)"   ) \
+    x(ucomis_dirty        , "scalar ucomis (no vzeroupper)"   ) \
+                                                                \
+    /* iadd */                                                  \
+    x(scalar_iadd         , "Scalar integer adds"             ) \
+    x(avx128_iadd         , "128-bit integer serial adds"     ) \
+    x(avx256_iadd         , "256-bit integer serial adds"     ) \
+    x(avx512_iadd         , "512-bit integer serial adds"     ) \
+                                                                \
+    x(avx128_iadd16     , "128-bit integer serial adds zmm16" ) \
+    x(avx256_iadd16     , "256-bit integer serial adds zmm16" ) \
+    x(avx512_iadd16     , "512-bit integer serial adds zmm16" ) \
+                                                                \
+    /* iadd throughput */                                       \
+    x(avx128_iadd_t       , "128-bit integer parallel adds"   ) \
+    x(avx256_iadd_t       , "256-bit integer parallel adds"   ) \
+                                                                \
+    /* reg-reg mov */                                           \
+    x(avx128_mov_sparse   , "128-bit reg-reg mov"             ) \
+    x(avx256_mov_sparse   , "256-bit reg-reg mov"             ) \
+    x(avx512_mov_sparse   , "512-bit reg-reg mov"             ) \
+                                                                \
+    /* merge */                                                 \
+    x(avx128_merge_sparse , "128-bit reg-reg merge mov"       ) \
+    x(avx256_merge_sparse , "256-bit reg-reg merge mov"       ) \
+    x(avx512_merge_sparse , "512-bit reg-reg merge mov"       ) \
+                                                                \
+    /* variable shift latency */                                \
+    x(avx128_vshift       , "128-bit variable shift (vpsrlvd)") \
+    x(avx256_vshift       , "256-bit variable shift (vpsrlvd)") \
+    x(avx512_vshift       , "512-bit variable shift (vpsrlvd)") \
+    /* variable shift throughput */                             \
+    x(avx128_vshift_t     , "128-bit variable shift (vpsrlvd)") \
+    x(avx256_vshift_t     , "256-bit variable shift (vpsrlvd)") \
+    x(avx512_vshift_t     , "512-bit variable shift (vpsrlvd)") \
+                                                                \
+    /* vplzcntd latency */                                      \
+    x(avx128_vlzcnt       , "128-bit lzcnt (vplzcntd)",       ) \
+    x(avx256_vlzcnt       , "256-bit lzcnt (vplzcntd)",       ) \
+    x(avx512_vlzcnt       , "512-bit lzcnt (vplzcntd)",       ) \
+    /* vplzcntd throughput */                                   \
+    x(avx128_vlzcnt_t     , "128-bit lzcnt (vplzcntd)",       ) \
+    x(avx256_vlzcnt_t     , "256-bit lzcnt (vplzcntd)",       ) \
+    x(avx512_vlzcnt_t     , "512-bit lzcnt (vplzcntd)",       ) \
+                                                                \
+    x(avx128_imul         , "128-bit integer muls (vpmuldq)"  ) \
+    x(avx256_imul         , "256-bit integer muls (vpmuldq)"  ) \
+    x(avx512_imul         , "512-bit integer muls (vpmuldq)"  ) \
+                                                                \
+    /* fma */                                                   \
+    x(avx128_fma_sparse   , "128-bit 64-bit sparse FMAs"      ) \
+    x(avx256_fma_sparse   , "256-bit 64-bit sparse FMAs"      ) \
+    x(avx512_fma_sparse   , "512-bit 64-bit sparse FMAs"      ) \
+    x(avx128_fma          , "128-bit serial DP FMAs"          ) \
+    x(avx256_fma          , "256-bit serial DP FMAs"          ) \
+    x(avx512_fma          , "512-bit serial DP FMAs"          ) \
+    x(avx128_fma_t        , "128-bit parallel DP FMAs"        ) \
+    x(avx256_fma_t        , "256-bit parallel DP FMAs"        ) \
+    x(avx512_fma_t        , "512-bit parallel DP FMAs"        ) \
+                                                                \
+    x(avx512_vpermw       , "512-bit serial WORD permute"     ) \
+    x(avx512_vpermw_t     , "512-bit parallel WORD permute"   ) \
+    x(avx512_vpermd       , "512-bit serial DWORD permute"    ) \
+    x(avx512_vpermd_t     , "512-bit parallel DWORD permute"  ) \
+
+
+#define DECLARE(f,...) cal_f f;
+
+// functions declared in asm-methods.asm
+FUNCS_X(DECLARE);
+
+// lembrar de verificar se alguma dessas é chamada no programa 
+
+// misc helpers
+void zeroupper_asm();
+
+static int zeroupper_allowed;
+
+void zeroupper() {
+    if (zeroupper_allowed) zeroupper_asm();
 }
 
-void init_class_A(){
-	printf("init_class_A\n");
-	iterations[CONTROL_COMPLEX][0] = 945899543;
-	iterations[CONTROL_CONDITIONAL][0] = 956757940;
-	iterations[CONTROL_RANDOM][0] = 57766744;
-	iterations[CONTROL_SMALL_BBL][0] = 1500044190;
-	iterations[CONTROL_SWITCH][0] = 982680794;
-	iterations[DEPENDENCY_CHAIN1][0] = 40621531;
-	iterations[DEPENDENCY_CHAIN2][0] = 70495570;
-	iterations[DEPENDENCY_CHAIN3][0] = 95813971;
-	iterations[DEPENDENCY_CHAIN4][0] = 104432313;
-	iterations[DEPENDENCY_CHAIN5][0] = 120954956;
-	iterations[DEPENDENCY_CHAIN6][0] = 129820576;
-	iterations[EXECUTION_FP_ADD_IND][0] = 178139683;
-	iterations[EXECUTION_FP_DIV_IND][0] = 42946779;
-	iterations[EXECUTION_FP_MUL_IND][0] = 351145519;
-	iterations[EXECUTION_INT_ADD_IND][0] = 132109878;
-	iterations[EXECUTION_INT_DIV_IND][0] = 8169954;
-	iterations[EXECUTION_INT_MUL_IND][0] = 126296006;
-	iterations[MEMORY_LOAD_DEP][0] = 997911488; //16KB
-	iterations[MEMORY_LOAD_DEP][1] = 547818475; //32KB
-	iterations[MEMORY_LOAD_DEP][2] = 528737621; //64KB
-	iterations[MEMORY_LOAD_DEP][3] = 554840149; //128KB
-	iterations[MEMORY_LOAD_DEP][4] = 512502101; //256KB
-	iterations[MEMORY_LOAD_DEP][5] = 511714987; //512KB
-	iterations[MEMORY_LOAD_DEP][6] = 472745984; //1024KB
-	iterations[MEMORY_LOAD_DEP][7] = 462303232; //2048KB
-	iterations[MEMORY_LOAD_DEP][8] = 129982464; //4096KB
-	iterations[MEMORY_LOAD_DEP][9] = 55929515; //8192KB
-	iterations[MEMORY_LOAD_DEP][10] = 68190208; //16384KB
-	iterations[MEMORY_LOAD_DEP][11] = 77463552; //32768KB
-	iterations[MEMORY_LOAD_DEP][12] = 93192192; //65536KB
-	iterations[MEMORY_LOAD_IND][0] = 1294112523; //16KB
-	iterations[MEMORY_LOAD_IND][1] = 1296502379; //32KB
-	iterations[MEMORY_LOAD_IND][2] = 1298342272; //64KB
-	iterations[MEMORY_LOAD_IND][3] = 1300037461; //128KB
-	iterations[MEMORY_LOAD_IND][4] = 1278506667; //256KB
-	iterations[MEMORY_LOAD_IND][5] = 1299353600; //512KB
-	iterations[MEMORY_LOAD_IND][6] = 1299585024; //1024KB
-	iterations[MEMORY_LOAD_IND][7] = 1299437382; //2048KB
-	iterations[MEMORY_LOAD_IND][8] = 1298819258; //4096KB
-	iterations[MEMORY_LOAD_IND][9] = 1300365312; //8192KB
-	iterations[MEMORY_LOAD_IND][10] = 1300341481; //16384KB
-	iterations[MEMORY_LOAD_IND][11] = 1296707212; //32768KB
-	iterations[MEMORY_LOAD_IND][12] = 1299900602; //65536KB
-	iterations[MEMORY_LOAD_RANDOM][0] = 1572710249; //16KB
-	iterations[MEMORY_LOAD_RANDOM][1] = 1437454499; //32KB
-	iterations[MEMORY_LOAD_RANDOM][2] = 1360599366; //64KB
-	iterations[MEMORY_LOAD_RANDOM][3] = 1240797184; //128KB
-	iterations[MEMORY_LOAD_RANDOM][4] = 999773836; //256KB
-	iterations[MEMORY_LOAD_RANDOM][5] = 851009536; //512KB
-	iterations[MEMORY_LOAD_RANDOM][6] = 741906991; //1024KB
-	iterations[MEMORY_LOAD_RANDOM][7] = 159157155; //2048KB
-	iterations[MEMORY_LOAD_RANDOM][8] = 69235805; //4096KB
-	iterations[MEMORY_LOAD_RANDOM][9] = 65684945; //8192KB
-	iterations[MEMORY_LOAD_RANDOM][10] = 76557964; //16384KB
-	iterations[MEMORY_LOAD_RANDOM][11] = 85053812; //32768KB
-	iterations[MEMORY_LOAD_RANDOM][12] = 104762275; //65536KB
-	iterations[MEMORY_STORE_IND][0] = 2489355148; //16KB
-	iterations[MEMORY_STORE_IND][1] = 2518942580; //32KB
-	iterations[MEMORY_STORE_IND][2] = 2522597981; //64KB
-	iterations[MEMORY_STORE_IND][3] = 2522503913; //128KB
-	iterations[MEMORY_STORE_IND][4] = 2520692550; //256KB
-	iterations[MEMORY_STORE_IND][5] = 2508260073; //512KB
-	iterations[MEMORY_STORE_IND][6] = 2504721873; //1024KB
-	iterations[MEMORY_STORE_IND][7] = 2492310249; //2048KB
-	iterations[MEMORY_STORE_IND][8] = 2487058432; //4096KB
-	iterations[MEMORY_STORE_IND][9] = 2494729123; //8192KB
-	iterations[MEMORY_STORE_IND][10] = 2493192006; //16384KB
-	iterations[MEMORY_STORE_IND][11] = 2493656716; //32768KB
-	iterations[MEMORY_STORE_IND][12] = 2496707119; //65536KB
-	iterations[MEMORY_STORE_RANDOM][0] = 1812209699; //16KB
-	iterations[MEMORY_STORE_RANDOM][1] = 1517841222; //32KB
-	iterations[MEMORY_STORE_RANDOM][2] = 1132062953; //64KB
-	iterations[MEMORY_STORE_RANDOM][3] = 947413364; //128KB
-	iterations[MEMORY_STORE_RANDOM][4] = 770901830; //256KB
-	iterations[MEMORY_STORE_RANDOM][5] = 676311040; //512KB
-	iterations[MEMORY_STORE_RANDOM][6] = 608290257; //1024KB
-	iterations[MEMORY_STORE_RANDOM][7] = 76067933; //2048KB
-	iterations[MEMORY_STORE_RANDOM][8] = 43810816; //4096KB
-	iterations[MEMORY_STORE_RANDOM][9] = 40584657; //8192KB
-	iterations[MEMORY_STORE_RANDOM][10] = 47674461; //16384KB
-	iterations[MEMORY_STORE_RANDOM][11] = 55550697; //32768KB
-	iterations[MEMORY_STORE_RANDOM][12] = 62294947; //65536KB
-	iterations[WORKLOAD_IDLE][0] = 0;
-}
+// dirties zmm15 upper bits
+void dirty_it();
+// dirties zmm15 upper bits
+void dirty_it16();
 
-void init_class_B(){
-	printf("init_class_B\n");
-	iterations[CONTROL_COMPLEX][0] = 3545750420;
-	iterations[CONTROL_CONDITIONAL][0] = 3559666634;
-	iterations[CONTROL_RANDOM][0] = 166313500;
-	iterations[CONTROL_SMALL_BBL][0] = 4312068293;
-	iterations[CONTROL_SWITCH][0] = 4145062272;
-	iterations[DEPENDENCY_CHAIN1][0] = 134491917;
-	iterations[DEPENDENCY_CHAIN2][0] = 269507186;
-	iterations[DEPENDENCY_CHAIN3][0] = 420045244;
-	iterations[DEPENDENCY_CHAIN4][0] = 534170738;
-	iterations[DEPENDENCY_CHAIN5][0] = 620024682;
-	iterations[DEPENDENCY_CHAIN6][0] = 701546406;
-	iterations[EXECUTION_FP_ADD_IND][0] = 808655722;
-	iterations[EXECUTION_FP_DIV_IND][0] = 100786069;
-	iterations[EXECUTION_FP_MUL_IND][0] = 1293847285;
-	iterations[EXECUTION_INT_ADD_IND][0] = 708815868;
-	iterations[EXECUTION_INT_DIV_IND][0] = 20738284;
-	iterations[EXECUTION_INT_MUL_IND][0] = 749736007;
-	
-	iterations[MEMORY_LOAD_DEP][0] = 2791178822; //16KB
-	iterations[MEMORY_LOAD_DEP][1] = 2520048062; //32KB
-	iterations[MEMORY_LOAD_DEP][2] = 1318790137; //64KB
-	iterations[MEMORY_LOAD_DEP][3] = 0; //128KB
-	iterations[MEMORY_LOAD_DEP][4] = 0; //256KB
-	iterations[MEMORY_LOAD_DEP][5] = 0; //512KB
-	iterations[MEMORY_LOAD_DEP][6] = 0; //1024KB
-	iterations[MEMORY_LOAD_DEP][7] = 0; //2048KB
-	iterations[MEMORY_LOAD_DEP][8] = 0; //4096KB
-	iterations[MEMORY_LOAD_DEP][9] = 280192409; //8192KB
-	iterations[MEMORY_LOAD_DEP][10] = 0; //16384KB
-	iterations[MEMORY_LOAD_DEP][11] = 0; //32768KB
-	iterations[MEMORY_LOAD_DEP][12] = 0; //65536KB
-	iterations[MEMORY_LOAD_IND][0] = 3594545828; //16KB
-	iterations[MEMORY_LOAD_IND][1] = 3589516492; //32KB
-	iterations[MEMORY_LOAD_IND][2] = 3586875394; //64KB
-	iterations[MEMORY_LOAD_IND][3] = 0; //128KB
-	iterations[MEMORY_LOAD_IND][4] = 0; //256KB
-	iterations[MEMORY_LOAD_IND][5] = 0; //512KB
-	iterations[MEMORY_LOAD_IND][6] = 0; //1024KB
-	iterations[MEMORY_LOAD_IND][7] = 0; //2048KB
-	iterations[MEMORY_LOAD_IND][8] = 0; //4096KB
-	iterations[MEMORY_LOAD_IND][9] = 3560960462; //8192KB
-	iterations[MEMORY_LOAD_IND][10] = 0; //16384KB
-	iterations[MEMORY_LOAD_IND][11] = 0; //32768KB
-	iterations[MEMORY_LOAD_IND][12] = 0; //65536KB
-	iterations[MEMORY_LOAD_RANDOM][0] = 5885559983; //16KB
-	iterations[MEMORY_LOAD_RANDOM][1] = 5848185979; //32KB
-	iterations[MEMORY_LOAD_RANDOM][2] = 5423904255; //64KB
-	iterations[MEMORY_LOAD_RANDOM][3] = 0; //128KB
-	iterations[MEMORY_LOAD_RANDOM][4] = 0; //256KB
-	iterations[MEMORY_LOAD_RANDOM][5] = 0; //512KB
-	iterations[MEMORY_LOAD_RANDOM][6] = 0; //1024KB
-	iterations[MEMORY_LOAD_RANDOM][7] = 0; //2048KB
-	iterations[MEMORY_LOAD_RANDOM][8] = 0; //4096KB
-	iterations[MEMORY_LOAD_RANDOM][9] = 559947559; //8192KB
-	iterations[MEMORY_LOAD_RANDOM][10] = 0; //16384KB
-	iterations[MEMORY_LOAD_RANDOM][11] = 0; //32768KB
-	iterations[MEMORY_LOAD_RANDOM][12] = 0; //65536KB
-	iterations[MEMORY_STORE_IND][0] = 3594545828; //16KB
-	iterations[MEMORY_STORE_IND][1] = 0; //32KB
-	iterations[MEMORY_STORE_IND][2] = 0; //64KB
-	iterations[MEMORY_STORE_IND][3] = 0; //128KB
-	iterations[MEMORY_STORE_IND][4] = 0; //256KB
-	iterations[MEMORY_STORE_IND][5] = 0; //512KB
-	iterations[MEMORY_STORE_IND][6] = 0; //1024KB
-	iterations[MEMORY_STORE_IND][7] = 0; //2048KB
-	iterations[MEMORY_STORE_IND][8] = 0; //4096KB
-	iterations[MEMORY_STORE_IND][9] = 0; //8192KB
-	iterations[MEMORY_STORE_IND][10] = 0; //16384KB
-	iterations[MEMORY_STORE_IND][11] = 0; //32768KB
-	iterations[MEMORY_STORE_IND][12] = 0; //65536KB
-	iterations[MEMORY_STORE_RANDOM][0] = 5885559983; //16KB
-	iterations[MEMORY_STORE_RANDOM][1] = 0; //32KB
-	iterations[MEMORY_STORE_RANDOM][2] = 0; //64KB
-	iterations[MEMORY_STORE_RANDOM][3] = 0; //128KB
-	iterations[MEMORY_STORE_RANDOM][4] = 0; //256KB
-	iterations[MEMORY_STORE_RANDOM][5] = 0; //512KB
-	iterations[MEMORY_STORE_RANDOM][6] = 0; //1024KB
-	iterations[MEMORY_STORE_RANDOM][7] = 0; //2048KB
-	iterations[MEMORY_STORE_RANDOM][8] = 0; //4096KB
-	iterations[MEMORY_STORE_RANDOM][9] = 0; //8192KB
-	iterations[MEMORY_STORE_RANDOM][10] = 0; //16384KB
-	iterations[MEMORY_STORE_RANDOM][11] = 0; //32768KB
-	iterations[MEMORY_STORE_RANDOM][12] = 0; //65536KB
-	iterations[WORKLOAD_IDLE][0] = 0;
-}
-
-void init_class_C(){
-	printf("init_class_C\n");
-	iterations[CONTROL_COMPLEX][0] = 11429171010;
-	iterations[CONTROL_CONDITIONAL][0] = 11450281175;
-	iterations[CONTROL_RANDOM][0] = 691820796;
-	iterations[CONTROL_SMALL_BBL][0] = 18181335730;
-	iterations[CONTROL_SWITCH][0] = 11798603206;
-	iterations[DEPENDENCY_CHAIN1][0] = 486551269;
-	iterations[DEPENDENCY_CHAIN2][0] = 831921433;
-	iterations[DEPENDENCY_CHAIN3][0] = 1151930167;
-	iterations[DEPENDENCY_CHAIN4][0] = 1273947776;
-	iterations[DEPENDENCY_CHAIN5][0] = 1468295836;
-	iterations[DEPENDENCY_CHAIN6][0] = 1562504802;
-	iterations[EXECUTION_FP_ADD_IND][0] = 2108226007;
-	iterations[EXECUTION_FP_DIV_IND][0] = 511461171;
-	iterations[EXECUTION_FP_MUL_IND][0] = 4293107171;
-	iterations[EXECUTION_INT_ADD_IND][0] = 1585778047;
-	iterations[EXECUTION_INT_DIV_IND][0] = 98139806;
-	iterations[EXECUTION_INT_MUL_IND][0] = 1511582954;
-	iterations[MEMORY_LOAD_DEP][0] = 11976905996; //16KB
-	iterations[MEMORY_LOAD_DEP][1] = 6670170531; //32KB
-	iterations[MEMORY_LOAD_DEP][2] = 6450912396; //64KB
-	iterations[MEMORY_LOAD_DEP][3] = 6412599668; //128KB
-	iterations[MEMORY_LOAD_DEP][4] = 6135612137; //256KB
-	iterations[MEMORY_LOAD_DEP][5] = 6152439622; //512KB
-	iterations[MEMORY_LOAD_DEP][6] = 5925756928; //1024KB
-	iterations[MEMORY_LOAD_DEP][7] = 3193135849; //2048KB
-	iterations[MEMORY_LOAD_DEP][8] = 585453940; //4096KB
-	iterations[MEMORY_LOAD_DEP][9] = 680716474; //8192KB
-	iterations[MEMORY_LOAD_DEP][10] = 827409873; //16384KB
-	iterations[MEMORY_LOAD_DEP][11] = 931397632; //32768KB
-	iterations[MEMORY_LOAD_DEP][12] = 1118496954; //65536KB
-	iterations[MEMORY_LOAD_IND][0] = 15531475503; //16KB
-	iterations[MEMORY_LOAD_IND][1] = 15553604608; //32KB
-	iterations[MEMORY_LOAD_IND][2] = 15566087215; //64KB
-	iterations[MEMORY_LOAD_IND][3] = 15579073350; //128KB
-	iterations[MEMORY_LOAD_IND][4] = 15309793466; //256KB
-	iterations[MEMORY_LOAD_IND][5] = 15567935302; //512KB
-	iterations[MEMORY_LOAD_IND][6] = 15584843590; //1024KB
-	iterations[MEMORY_LOAD_IND][7] = 15584261213; //2048KB
-	iterations[MEMORY_LOAD_IND][8] = 15588440623; //4096KB
-	iterations[MEMORY_LOAD_IND][9] = 15586724771; //8192KB
-	iterations[MEMORY_LOAD_IND][10] = 15594040972; //16384KB
-	iterations[MEMORY_LOAD_IND][11] = 15589084067; //32768KB
-	iterations[MEMORY_LOAD_IND][12] = 15593278371; //65536KB
-	iterations[MEMORY_LOAD_RANDOM][0] = 18904209210; //16KB
-	iterations[MEMORY_LOAD_RANDOM][1] = 17259223343; //32KB
-	iterations[MEMORY_LOAD_RANDOM][2] = 16380481536; //64KB
-	iterations[MEMORY_LOAD_RANDOM][3] = 15081157073; //128KB
-	iterations[MEMORY_LOAD_RANDOM][4] = 11997600303; //256KB
-	iterations[MEMORY_LOAD_RANDOM][5] = 10114395788; //512KB
-	iterations[MEMORY_LOAD_RANDOM][6] = 8658841228; //1024KB
-	iterations[MEMORY_LOAD_RANDOM][7] = 2705993356; //2048KB
-	iterations[MEMORY_LOAD_RANDOM][8] = 862549085; //4096KB
-	iterations[MEMORY_LOAD_RANDOM][9] = 814403956; //8192KB
-	iterations[MEMORY_LOAD_RANDOM][10] = 919601152; //16384KB
-	iterations[MEMORY_LOAD_RANDOM][11] = 1025840966; //32768KB
-	iterations[MEMORY_LOAD_RANDOM][12] = 1252667020; //65536KB
-	iterations[MEMORY_STORE_IND][0] = 29848532224; //16KB
-	iterations[MEMORY_STORE_IND][1] = 30107401937; //32KB
-	iterations[MEMORY_STORE_IND][2] = 30202487063; //64KB
-	iterations[MEMORY_STORE_IND][3] = 30252897652; //128KB
-	iterations[MEMORY_STORE_IND][4] = 30301594717; //256KB
-	iterations[MEMORY_STORE_IND][5] = 30004652218; //512KB
-	iterations[MEMORY_STORE_IND][6] = 30134932573; //1024KB
-	iterations[MEMORY_STORE_IND][7] = 30029916346; //2048KB
-	iterations[MEMORY_STORE_IND][8] = 29971629521; //4096KB
-	iterations[MEMORY_STORE_IND][9] = 30026039296; //8192KB
-	iterations[MEMORY_STORE_IND][10] = 29914669801; //16384KB
-	iterations[MEMORY_STORE_IND][11] = 29935224273; //32768KB
-	iterations[MEMORY_STORE_IND][12] = 29766498863; //65536KB
-	iterations[MEMORY_STORE_RANDOM][0] = 21746188812; //16KB
-	iterations[MEMORY_STORE_RANDOM][1] = 18127075491; //32KB
-	iterations[MEMORY_STORE_RANDOM][2] = 13624963025; //64KB
-	iterations[MEMORY_STORE_RANDOM][3] = 11444278458; //128KB
-	iterations[MEMORY_STORE_RANDOM][4] = 9263666641; //256KB
-	iterations[MEMORY_STORE_RANDOM][5] = 8128599133; //512KB
-	iterations[MEMORY_STORE_RANDOM][6] = 7295759453; //1024KB
-	iterations[MEMORY_STORE_RANDOM][7] = 908588125; //2048KB
-	iterations[MEMORY_STORE_RANDOM][8] = 526939229; //4096KB
-	iterations[MEMORY_STORE_RANDOM][9] = 511973190; //8192KB
-	iterations[MEMORY_STORE_RANDOM][10] = 571497751; //16384KB
-	iterations[MEMORY_STORE_RANDOM][11] = 628668975; //32768KB
-	iterations[MEMORY_STORE_RANDOM][12] = 748254301; //65536KB
-	iterations[WORKLOAD_IDLE][0] = 0;
-}
-
-void set_workload_iterations(char class){
-	uint64_t i;
-	iterations = (uint64_t **) (malloc(NWORKLOADS * sizeof(uint64_t *)));
-	for(i = 0; i < NWORKLOADS; i++){
-		if(i < 17)
-			iterations[i] = (uint64_t *) (calloc(1,     sizeof(uint64_t)));
-		else
-			iterations[i] = (uint64_t *) (calloc(13, sizeof(uint64_t)));
-	}
-			
-	if(class == 'A')
-		init_class_A();
-	else if(class == 'B')
-		init_class_B();
-	else if(class == 'C')
-		init_class_C();
-	else
-		init_class();
-
-	for(i = 0; i < nt_exec; i++){
-		if(threads[i].memoryA <= (unsigned long int) powf(2, 12 + 4)){
-			if(threads[i].memoryA == 0)
-				threads[i].iterations = iterations[threads[i].typeA][0];
-			else
-				threads[i].iterations = iterations[threads[i].typeA][(int) log2f(threads[i].memoryA) - 4];
-		}
-		  else
-		  	threads[i].iterations = iterations[threads[i].typeA][12];
-	}
-
-	for(i = 0; i < NWORKLOADS; i++)
-		free(iterations[i]);
-	free(iterations);
-}
+/* Lines from 12 to 112 - Source: https://github.com/travisdowns/avx-turbo  */
 
 void init_workload(){
 	uint64_t i = 0;
@@ -418,6 +139,51 @@ void init_workload(){
 	work[i++] = memory_store_ind;
 	work[i++] = memory_store_random;
 	work[i++] = workload_idle;
+	work[i++] = h_ucomis_clean;
+	work[i++] = h_ucomis_dirty;
+	work[i++] = h_scalar_iadd;
+	work[i++] = h_avx128_iadd;
+	work[i++] = h_avx256_iadd;
+	work[i++] = h_avx512_iadd;
+	work[i++] = h_avx128_iadd16;
+	work[i++] = h_avx256_iadd16;
+	work[i++] = h_avx512_iadd16;
+	work[i++] = h_avx128_iadd_t;
+	work[i++] = h_avx256_iadd_t;
+	work[i++] = h_avx128_mov_sparse;
+	work[i++] = h_avx256_mov_sparse;
+	work[i++] = h_avx512_mov_sparse;
+	work[i++] = h_avx128_merge_sparse;
+	work[i++] = h_avx256_merge_sparse;
+	work[i++] = h_avx512_merge_sparse;
+	work[i++] = h_avx128_vshift;
+	work[i++] = h_avx256_vshift;
+	work[i++] = h_avx512_vshift;
+	work[i++] = h_avx128_vshift_t;
+	work[i++] = h_avx256_vshift_t;
+	work[i++] = h_avx512_vshift_t;
+	work[i++] = h_avx128_vlzcnt;
+	work[i++] = h_avx256_vlzcnt;
+	work[i++] = h_avx512_vlzcnt;
+	work[i++] = h_avx128_vlzcnt_t;
+	work[i++] = h_avx256_vlzcnt_t;
+	work[i++] = h_avx512_vlzcnt_t;
+	work[i++] = h_avx128_imul;
+	work[i++] = h_avx256_imul;
+	work[i++] = h_avx512_imul;
+	work[i++] = h_avx128_fma_sparse;
+	work[i++] = h_avx256_fma_sparse;
+	work[i++] = h_avx512_fma_sparse;
+	work[i++] = h_avx128_fma;
+	work[i++] = h_avx256_fma;
+	work[i++] = h_avx512_fma;
+	work[i++] = h_avx128_fma_t;
+	work[i++] = h_avx256_fma_t;
+	work[i++] = h_avx512_fma_t;
+	work[i++] = h_avx512_vpermw;
+	work[i++] = h_avx512_vpermw_t;
+	work[i++] = h_avx512_vpermd;
+	work[i++] = h_avx512_vpermd_t;
 }
 
 void control_complex(thread_data_t *t){
@@ -455,9 +221,10 @@ void control_complex(thread_data_t *t){
 			}
 		}
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = k;
+	t->iterations = i;
 }
 
 void control_conditional(thread_data_t *t){
@@ -473,9 +240,10 @@ void control_conditional(thread_data_t *t){
 			print -= i;
 		}
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = print;
+	t->iterations = i;
 }
 
 void control_random(thread_data_t *t){
@@ -517,9 +285,10 @@ void control_random(thread_data_t *t){
 			asm volatile("mov %0, %0" : "=r" (lfsr) : "r" (lfsr) : );								
 
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = bit;
+	t->iterations = i;
 }
 
 void control_small_bbl(thread_data_t *t){
@@ -531,12 +300,13 @@ void control_small_bbl(thread_data_t *t){
 
 	do{
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 	
 	for(j = 0; j < 64; j++)
 		print += count[j];
 
 	t->v2 = print;
+	t->iterations = i;
 }
 
 void control_switch(thread_data_t *t){
@@ -611,9 +381,10 @@ void control_switch(thread_data_t *t){
 				exit(EXIT_FAILURE);
 		}
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = print;
+	t->iterations = i;
 }
 
 void dependency_chain1(thread_data_t *t){
@@ -657,9 +428,10 @@ void dependency_chain1(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count0) : "0" (count0) : );
 		asm volatile("add %0, %0" : "=r" (count0) : "0" (count0) : );
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = count0;
+	t->iterations = i;
 }
 
 void dependency_chain2(thread_data_t *t){
@@ -703,9 +475,10 @@ void dependency_chain2(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count0) : "0" (count0) : );
 		asm volatile("add %0, %0" : "=r" (count1) : "0" (count1) : );
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = count1;
+	t->iterations = i;
 }
 
 
@@ -754,9 +527,10 @@ void dependency_chain3(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count1) : "0" (count1) : );
 		asm volatile("add %0, %0" : "=r" (count2) : "0" (count2) : );
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = count2;
+	t->iterations = i;
 }
 
 void dependency_chain4(thread_data_t *t){
@@ -804,9 +578,10 @@ void dependency_chain4(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count2) : "0" (count2) : );
 		asm volatile("add %0, %0" : "=r" (count3) : "0" (count3) : );
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = count3;
+	t->iterations = i;
 }
 
 void dependency_chain5(thread_data_t *t){
@@ -850,9 +625,10 @@ void dependency_chain5(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count3) : "0" (count3) : );
 		asm volatile("add %0, %0" : "=r" (count4) : "0" (count4) : );
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = count4;
+	t->iterations = i;
 }
 
 void dependency_chain6(thread_data_t *t){
@@ -895,9 +671,10 @@ void dependency_chain6(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count4) : "0" (count4) : );
 		asm volatile("add %0, %0" : "=r" (count5) : "0" (count5) : );
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = count5;
+	t->iterations = i;
 }
 
 void execution_fp_add_ind(thread_data_t *t){
@@ -964,7 +741,7 @@ void execution_fp_add_ind(thread_data_t *t){
 		asm volatile("addsd %%xmm6, %%xmm6" : : : "xmm6");
 		asm volatile("addsd %%xmm7, %%xmm7" : : : "xmm7");
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
     asm volatile("push $0x0":::);
     asm volatile("movsd %%xmm0, (%%rsp)" : : : );
@@ -972,6 +749,7 @@ void execution_fp_add_ind(thread_data_t *t){
     asm volatile("pop %%rbx" : : : "rbx");	
 
 	t->v2 = count;
+	t->iterations = i;
 }
 
 void execution_fp_div_ind(thread_data_t *t){
@@ -1037,7 +815,7 @@ void execution_fp_div_ind(thread_data_t *t){
 		asm volatile("divsd %%xmm6, %%xmm6" : : : "xmm6");
 		asm volatile("divsd %%xmm7, %%xmm7" : : : "xmm7");
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
     asm volatile("push $0x0":::);
     asm volatile("movsd %%xmm0, (%%rsp)" : : : );
@@ -1045,6 +823,7 @@ void execution_fp_div_ind(thread_data_t *t){
     asm volatile("pop %%rbx" : : : "rbx");
 
 	t->v2 = count;
+	t->iterations = i;
 }
 
 void execution_fp_mul_ind(thread_data_t *t){
@@ -1111,7 +890,7 @@ void execution_fp_mul_ind(thread_data_t *t){
 		asm volatile("mulsd %%xmm6, %%xmm6" : : : "xmm6");
 		asm volatile("mulsd %%xmm7, %%xmm7" : : : "xmm7");
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
     asm volatile("push $0x0":::);
     asm volatile("movsd %%xmm0, (%%rsp)" : : : );
@@ -1119,6 +898,7 @@ void execution_fp_mul_ind(thread_data_t *t){
     asm volatile("pop %%rbx" : : : "rbx");
 
 	t->v2 = count;
+	t->iterations = i;
 }
 
 void execution_int_add_ind(thread_data_t *t){
@@ -1162,9 +942,10 @@ void execution_int_add_ind(thread_data_t *t){
 		asm volatile("add %0, %0" : "=r" (count6) : "0" (count6) : );
 		asm volatile("add %0, %0" : "=r" (count7) : "0" (count7) : );
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = count7;
+	t->iterations = i;
 }
 
 void execution_int_div_ind(thread_data_t *t){
@@ -1212,10 +993,11 @@ void execution_int_div_ind(thread_data_t *t){
 		asm volatile("idiv %%rbx" : : : "rax", "rdx", "rbx" );
 		asm volatile("idiv %%rbx" : : : "rax", "rdx", "rbx" );
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 	asm volatile("mov %%rbx, %0" : "=r"(count) : : "rbx");
 
 	t->v2 = count;
+	t->iterations = i;
 }
 
 void execution_int_mul_ind(thread_data_t *t){
@@ -1259,9 +1041,10 @@ void execution_int_mul_ind(thread_data_t *t){
 		asm volatile("imul %0, %0" : "=r" (count6) : "0" (count6) : );
 		asm volatile("imul %0, %0" : "=r" (count7) : "0" (count7) : );
 		i++;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = count7;
+	t->iterations = i;
 }
 
 void alloc_list(thread_data_t *t){
@@ -1339,9 +1122,10 @@ void memory_load_dep(thread_data_t *t){
 			print = ptr_this->v;
 		}
 		i += j;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = print;
+	t->iterations = i;
 }
 
 void alloc_vec(thread_data_t *t){
@@ -1414,9 +1198,10 @@ void memory_load_ind(thread_data_t *t){
 			count += t->ptr_vec[jump + 31].v;			
 		}
 		i += j;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = count;
+	t->iterations = i;
 }
 
 void memory_load_random(thread_data_t *t){
@@ -1472,12 +1257,13 @@ void memory_load_random(thread_data_t *t){
 			count[31] += t->ptr_vec[jump + 31].v;
 		}
 		i += j;
-	}while(i < t->iterations);
+	}while(alive);
 
 	for(j = 0; j < 8; j++)
 		print += count[j];
 
 	t->v2 = print;
+	t->iterations = i;
 }
 
 void memory_store_ind(thread_data_t *t){
@@ -1524,9 +1310,10 @@ void memory_store_ind(thread_data_t *t){
 		}
 		print += t->ptr_vec[0].v;
 		i += j;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = print;
+	t->iterations = i;
 }
 
 void memory_store_random(thread_data_t *t){
@@ -1581,15 +1368,476 @@ void memory_store_random(thread_data_t *t){
 		}
 		print += t->ptr_vec[0].v;
 		i += j;
-	}while(i < t->iterations);
+	}while(alive);
 
 	t->v2 = jump;
+	t->iterations = i;
 }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 void workload_idle(thread_data_t *t){
+	uint64_t i = 0;
 	printf("workload_idle\n");
+	do{
+		__asm__ __volatile__ ("pause");
+		__asm__ __volatile__ ("pause");
+		__asm__ __volatile__ ("pause");
+		__asm__ __volatile__ ("pause");
+		__asm__ __volatile__ ("pause");
+		i++;
+	}while(alive);
+	t->iterations = i;
 	__asm__ __volatile__ ("pause");
 }
 #pragma GCC diagnostic pop
+
+void h_ucomis_clean(thread_data_t *t){
+	uint64_t i = 0;
+	printf("ucomis_clean\n");
+	do{
+		ucomis_clean(5E8);
+		i++;
+	}while(alive);
+	t->iterations = i;	
+}
+
+void h_ucomis_dirty(thread_data_t *t){
+	uint64_t i = 0;
+	printf("ucomis_dirty\n");
+	do{
+		ucomis_dirty(6E8);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_scalar_iadd(thread_data_t *t){
+	uint64_t i = 0;
+	printf("scalar_iadd\n");
+	do{
+		scalar_iadd(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_iadd(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_iadd\n");
+	do{
+		avx128_iadd(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_iadd(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_iadd\n");
+	do{
+		avx256_iadd(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_iadd(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_iadd\n");
+	do{
+		avx512_iadd(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_iadd16(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_iadd16\n");
+	do{
+		avx128_iadd16(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_iadd16(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_iadd16\n");
+	do{
+		avx256_iadd16(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_iadd16(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_iadd16\n");
+	do{
+		avx512_iadd16(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_iadd_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_iadd_t\n");
+	do{
+		avx128_iadd_t(3E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_iadd_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_iadd_t\n");
+	do{
+		avx256_iadd_t(3E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_mov_sparse(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_mov_sparse\n");
+	do{
+		avx128_mov_sparse(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_mov_sparse(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_mov_sparse\n");
+	do{
+		avx256_mov_sparse(1.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_mov_sparse(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_mov_sparse\n");
+	do{
+		avx512_mov_sparse(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_merge_sparse(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_merge_sparse\n");
+	do{
+		avx128_merge_sparse(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_merge_sparse(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_merge_sparse\n");
+	do{
+		avx256_merge_sparse(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_merge_sparse(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_merge_sparse\n");
+	do{
+		avx512_merge_sparse(1.7E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_vshift(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_vshift\n");
+	do{
+		avx128_vshift(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_vshift(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_vshift\n");
+	do{
+		avx256_vshift(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_vshift(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_vshift\n");
+	do{
+		avx512_vshift(1E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_vshift_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_vshift_t\n");
+	do{
+		avx128_vshift_t(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_vshift_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_vshift_t\n");
+	do{
+		avx256_vshift_t(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_vshift_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_vshift_t\n");
+	do{
+		avx512_vshift_t(1E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_vlzcnt(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_vlzcnt\n");
+	do{
+		avx128_vlzcnt(0.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_vlzcnt(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_vlzcnt\n");
+	do{
+		avx256_vlzcnt(0.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_vlzcnt(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_vlzcnt\n");
+	do{
+		avx512_vlzcnt(0.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_vlzcnt_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_vlzcnt_t\n");
+	do{
+		avx128_vlzcnt_t(1.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_vlzcnt_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_vlzcnt_t\n");
+	do{
+		avx256_vlzcnt_t(1.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_vlzcnt_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_vlzcnt_t\n");
+	do{
+		avx512_vlzcnt_t(0.7E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_imul(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_imul\n");
+	do{
+		avx128_imul(0.4E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_imul(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_imul\n");
+	do{
+		avx256_imul(0.4E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_imul(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_imul\n");
+	do{
+		avx512_imul(0.4E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_fma_sparse(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_fma_sparse\n");
+	do{
+		avx128_fma_sparse(1.8E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_fma_sparse(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_fma_sparse\n");
+	do{
+		avx256_fma_sparse(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_fma_sparse(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_fma_sparse\n");
+	do{
+		avx512_fma_sparse(2E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_fma(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_fma\n");
+	do{
+		avx128_fma(0.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_fma(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_fma\n");
+	do{
+		avx256_fma(0.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_fma(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_fma\n");
+	do{
+		avx512_fma(0.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx128_fma_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx128_fma_t\n");
+	do{
+		avx128_fma_t(1.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx256_fma_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx256_fma_t\n");
+	do{
+		avx256_fma_t(1.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_fma_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_fma_t\n");
+	do{
+		avx512_fma_t(0.6E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_vpermw(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_vpermw\n");
+	do{
+		avx512_vpermw(0.3E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_vpermw_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_vpermw_t\n");
+	do{
+		avx512_vpermw_t(0.5E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_vpermd(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_vpermd\n");
+	do{
+		avx512_vpermd(0.7E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}
+
+void h_avx512_vpermd_t(thread_data_t *t){
+	uint64_t i = 0;
+	printf("avx512_vpermd_t\n");
+	do{
+		avx512_vpermd_t(0.9E9);
+		i++;
+	}while(alive);
+	t->iterations = i;
+}

@@ -17,10 +17,17 @@
 #include "../include/mypapi.h"
 #include "../include/workloads.h"
 
+volatile int alive = 1;
 thread_data_t *threads = NULL;
 uint32_t nt = 0, nt_exec = 0;
 extern uint32_t papi_enabled;
 extern uint32_t os_enabled;
+
+void *time_monitor(void *walltime){
+	usleep((uint64_t) walltime * 1000000);
+	alive = 0;
+	pthread_exit(NULL);
+}
 
 void libmapping_set_aff_thread(pid_t pid, uint64_t cpu){
 	#if defined(linux) || defined (__linux)
@@ -93,7 +100,7 @@ int isInt(char *str){
 	return 1;
 }
 
-void parse_type_vector(const char *argv, char class){
+void parse_type_vector(const char *argv){
 	uint64_t *memory, i, j, n, size = strlen(argv);
 	char *str, *token;
 	workload_t *workload;
@@ -147,8 +154,6 @@ void parse_type_vector(const char *argv, char class){
 		threads[i].typeB = workload[(i + 1) % n];
 		threads[i].memoryB = memory[(i + 1) % n];
 	}
-	
-	set_workload_iterations(class);
 
 	free(workload);
 	free(memory);
