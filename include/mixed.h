@@ -9,6 +9,7 @@
 	#include <sys/types.h>
 	#include "workloads.h"
 
+	void *freq_monitor(void *data);
 	void *time_monitor(void *walltime);
 	void libmapping_set_aff_thread(pid_t pid, uint64_t cpu);
 	void *pthreads_callback(void *data);

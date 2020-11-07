@@ -19,9 +19,38 @@
 
 volatile int alive = 1;
 thread_data_t *threads = NULL;
-uint32_t nt = 0, nt_exec = 0;
+uint32_t nt = 0, nt_exec = 0, freq_time_ms = 1;
 extern uint32_t papi_enabled;
 extern uint32_t os_enabled;
+extern char log_dir[BUFFER_SIZE];
+
+void *freq_monitor(void *data){
+	printf("freq monitor!\n");
+	freq_thread_data_t *f = (freq_thread_data_t *) data;
+	char buffer[BUFFER_SIZE];
+	size_t read;
+	FILE *fr, *fw;
+
+	sprintf(buffer, "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", f->cpu);
+	fr = fopen(buffer, "r");
+
+	sprintf(buffer, "%s/%s.%d.freq", log_dir, workload_name[f->type], f->cpu);
+	fw = fopen(buffer, "w");
+	
+	fprintf(fw, "%lu\n", (unsigned long) time(NULL));
+	while(alive){
+		read = fread(buffer, 1, BUFFER_SIZE - 1, fr);
+		buffer[read] = '\0';
+		fseek(fr, 0, SEEK_SET);
+		fwrite(buffer, 1, read, fw);
+		usleep((uint64_t) freq_time_ms * 1000);
+	}
+
+	fclose(fr);
+	fclose(fw);
+
+	pthread_exit(NULL);
+}
 
 void *time_monitor(void *walltime){
 	usleep((uint64_t) walltime * 1000000);
@@ -79,12 +108,21 @@ void *pthreads_callback (void *data){
 	if(papi_enabled && t->typeA != WORKLOAD_IDLE)
 		papi_thread_init(t);
 
+
+	pthread_t thread_freq;
+	freq_thread_data_t f;
+	f.cpu = t->cpu;
+	f.type = t->typeA;
+	pthread_create(&thread_freq, NULL, freq_monitor, (void *) &f);
+
 	double start = get_time();
 
 	(*work[t->typeA]) (t);
 	
 	double end = get_time();
 	t->time = end - start;
+
+	pthread_join(thread_freq, NULL);
 
 	if(papi_enabled && t->typeA != WORKLOAD_IDLE)
 		papi_thread_finish(t);

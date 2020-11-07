@@ -5,11 +5,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "../include/workloads.h"
 #include "../include/mixed.h"
 #include "../include/mypapi.h"
 #include "../include/libmapping.h"
 
+char log_dir[BUFFER_SIZE];
 uint32_t papi_enabled = 0;
 uint32_t os_enabled = 0;
 extern thread_data_t *threads;
@@ -37,6 +40,20 @@ void selection_sort(thread_data_t *A, int N){
 
 int main(int argc, char **argv){
 	printf("PAPI-based microarchitectural benchmark\n\n");
+	
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+
+	struct stat st = {0};
+
+	sprintf(log_dir, "./log/%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+	if(stat(log_dir, &st) == -1)
+    	mkdir(log_dir, 0700);
+
+	sprintf(log_dir, "%s/%02d-%02d-%02d/",log_dir, tm.tm_hour, tm.tm_min, tm.tm_sec);
+	if(stat(log_dir, &st) == -1)
+    	mkdir(log_dir, 0700);
+
 	uint64_t i, j = 0, memory;
 	double min_time, max_time, avg_time;
 	uint64_t min_iterations, max_iterations, avg_iterations;

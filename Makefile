@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 CC := gcc -fopenmp
 HOST := $(shell hostname)
-TARGET := bin/mixed.$(HOST)
+TARGET := bin/mixed.$(HOST).x
 
 SOURCES := $(shell find src -type f -name *.c)
 OBJECTS := $(patsubst src/%,build/%,$(SOURCES:.c=.$(HOST).o))

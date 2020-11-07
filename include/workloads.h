@@ -4,6 +4,10 @@
 	#define NWORKLOADS 68
 	#define PAPI_MAX_EVENTS 1
 
+	#ifndef BUFFER_SIZE
+		#define BUFFER_SIZE 1024
+	#endif
+
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wunused-variable"
 	static char *workload_name[] = {
@@ -173,6 +177,11 @@
 		vec_t *ptr_vec;
 		uint64_t memoryA, memoryB; // in KB
 	}  __attribute__ ((aligned (CACHE_LINE_SIZE))) thread_data_t;
+
+	typedef struct freq_thread_data_t{
+		workload_t type;
+		uint32_t cpu;
+	}  __attribute__ ((aligned (CACHE_LINE_SIZE))) freq_thread_data_t;
 
 	void (*work[NWORKLOADS]) (thread_data_t *t);
 	void init_workload();

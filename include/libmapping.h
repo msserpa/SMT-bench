@@ -1,7 +1,10 @@
 #ifndef LIBMAPPING_H
 
 	#define LIBMAPPING_H
-	#define BUFFER_SIZE 1024
+	
+	#ifndef BUFFER_SIZE
+		#define BUFFER_SIZE 1024
+	#endif
 
 	void error_handler(const char *call, const int line);
 
