@@ -5,6 +5,7 @@
 #include "../include/mixed.h"
 #include "../include/workloads.h"
 #include <omp.h>
+#include <unistd.h>
 
 extern thread_data_t *threads;
 extern uint32_t nt, nt_exec;
@@ -1768,6 +1769,7 @@ void h_avx512_fma(thread_data_t *t){
 	do{
 		avx512_fma(0.5E9);
 		i++;
+
 	}while(alive);
 	t->iterations = i;
 }
@@ -1797,6 +1799,7 @@ void h_avx512_fma_t(thread_data_t *t){
 	printf("avx512_fma_t\n");
 	do{
 		avx512_fma_t(0.6E9);
+		usleep((uint64_t) 20 * 1000);
 		i++;
 	}while(alive);
 	t->iterations = i;

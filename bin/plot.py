@@ -31,5 +31,7 @@ ax = result.plot()
 ax.axes.xaxis.set_visible(False)
 ax.set_ylabel("Current frequency of the CPU")
 ax.legend(legend, loc='lower right')
+ax.set_ylim([0, 4*10**6])
 
-ax.get_figure().savefig(folder + '/plot.pdf') 
+ax.get_figure().savefig(folder + '/plot.pdf')
+ax.get_figure().savefig(folder + '/plot.png')
