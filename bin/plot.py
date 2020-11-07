@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
-
+import sys
 import glob
 import pandas as pd
 
+if len(sys.argv) < 2:
+	print('Usage: {} <directory>'.format(sys.argv[0]))
+	exit()
+
+folder = sys.argv[1]
+
 data = []
-for file in glob.glob("*.freq", ):
+for file in glob.glob(folder + "/*.freq", ):
     data.append(file)
 
 legend = []
@@ -26,4 +32,4 @@ ax.axes.xaxis.set_visible(False)
 ax.set_ylabel("Current frequency of the CPU")
 ax.legend(legend, loc='lower right')
 
-ax.get_figure().savefig('plot.pdf') 
+ax.get_figure().savefig(folder + '/plot.pdf') 

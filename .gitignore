@@ -56,7 +56,8 @@ dkms.conf
 *.csv
 *.err
 *.freq
-
+*.pdf
+ 
 # Ignore bin build exp and lib dirs
 build/*
 exp/scripts/*
