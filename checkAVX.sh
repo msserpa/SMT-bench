@@ -65,5 +65,5 @@ echo
 echo ------------------AVX-512------------------
 echo
 touch /tmp/asm.out
-awk '/[ \t](zmm)[ \t]/' /tmp/avx.asm
+grep "%zmm" /tmp/avx.asm
 echo
