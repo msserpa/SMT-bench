@@ -2,6 +2,9 @@
 
 #set -o errexit -o nounset -o pipefail -o posix
 
+$SCRATCH/governor/utils --ondemand
+$SCRATCH/governor/utils --turbo-on
+
 host=`hostname | awk -F. {'print $1'}`
 arch=`gcc-10.2 -march=native -Q --help=target | grep march | head -n1 | awk '{print $2}'`
 
@@ -41,15 +44,16 @@ while true; do
 	unset -v PAPI_EVENT
 	unset -v LD_PRELOAD
 
-	date +"%d/%m/%Y %H:%M:%S"
-	printf "\t Warm-up\n"
-	stress-ng --cpu 100 -t 5 &> /tmp/time.stress
-	sed 's/^/\t/' /tmp/time.stress
-	printf "\n"
-
 	printf "\t Step: $step \n\n"
 
 	while IFS=\; read -r thread mapping appA appB; do
+		date +"%d/%m/%Y %H:%M:%S"
+		printf "\t Warm-up\n"
+		stress-ng --cpu 100 -t 3 &> /tmp/time.stress
+		sed 's/^/\t/' /tmp/time.stress
+		printf "\n"
+		sleep 2
+
 		grepA=`echo $appA | awk -F: '{printf "%s", $1} NF > 1{printf "-%sKB", $2} {printf ":"}'`
 		grepB=`echo $appB | awk -F: '{printf "%s", $1} NF > 1{printf "-%sKB", $2} {printf ":"}'`
 		
