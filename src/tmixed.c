@@ -46,24 +46,37 @@ int main(int argc, char **argv){
 
 	struct stat st = {0};
 
-	char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE], *str;
 
 	sprintf(log_dir, "./log/");
 	
 	if(stat(log_dir, &st) == -1)
     	mkdir(log_dir, 0700);
 
-	sprintf(buffer, "%04d-%02d-%02d/", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
-	strcat(log_dir, buffer);
-	
-	if(stat(log_dir, &st) == -1)
-    	mkdir(log_dir, 0700);
+    if(getenv("LOG_DIR")){
+    	str = strtok(getenv("LOG_DIR"),"/");
+    	while(str != NULL){
+    		strcat(log_dir, str);
+    		strcat(log_dir, "/");
 
-	sprintf(buffer, "%02d-%02d-%02d/", tm.tm_hour, tm.tm_min, tm.tm_sec);
-	strcat(log_dir, buffer);
-	
-	if(stat(log_dir, &st) == -1)
-    	mkdir(log_dir, 0700);
+			if(stat(log_dir, &st) == -1)
+		    	mkdir(log_dir, 0700);
+
+    		str = strtok(NULL, "/");
+    	}
+    }else{
+		sprintf(buffer, "%04d-%02d-%02d/", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+		strcat(log_dir, buffer);
+		
+		if(stat(log_dir, &st) == -1)
+	    	mkdir(log_dir, 0700);
+
+		sprintf(buffer, "%02d-%02d-%02d/", tm.tm_hour, tm.tm_min, tm.tm_sec);
+		strcat(log_dir, buffer);
+		
+		if(stat(log_dir, &st) == -1)
+	    	mkdir(log_dir, 0700);
+	}
 
 	uint64_t i, j = 0, memory;
 	double min_time, max_time, avg_time;

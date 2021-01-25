@@ -11,6 +11,7 @@
 #include "../include/mixed.h"
 #include "../include/spinlock.h"
 
+extern char log_dir[2 * BUFFER_SIZE];
 extern uint32_t papi_enabled;
 static FILE *fpapi = NULL;
 extern char *map;
@@ -41,8 +42,6 @@ void papi_init(){
 	retval = PAPI_thread_init(pthread_self);
 	if(retval != PAPI_OK)
 		error_handler_papi(__LINE__, "PAPI_thread_init", retval);
-
-	system("rm -f /tmp/micro.papi &> /dev/null");
 
 	/* Get environment variable */
 	list_events = (char **) calloc(PAPI_MAX_EVENTS, sizeof(char *));
@@ -142,6 +141,7 @@ void papi_thread_init(void *data){
 void papi_thread_finish(void *data){
 	thread_data_t *t = (thread_data_t*)data;
 	uint32_t i;
+	char buffer[3 * BUFFER_SIZE];
 
 	/* Stop PAPI */
 	int retval = PAPI_stop(t->EventSet1, t->value);
@@ -167,8 +167,10 @@ void papi_thread_finish(void *data){
 		}
 	}	
 
+	sprintf(buffer, "%smicro.papi", log_dir);
+
 	spinlock_lock(&threads_lock);
-	fpapi = fopen("/tmp/micro.papi", "a");
+	fpapi = fopen(buffer, "a");
 	assert(fpapi != NULL);
 	for(i = 0; i < num_events; i++)
 		fprintf(stderr, "%s,%s,%lu,%s,%lu,%s,%d,%lld\n", map, workload_name[t->typeA], t->memoryA, workload_name[t->typeB], t->memoryB, list_events[i], t->cpu, t->value[i]);	

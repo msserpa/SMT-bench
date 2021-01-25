@@ -31,21 +31,24 @@ void *freq_monitor(void *data){
 	size_t read;
 	FILE *fr, *fw;
 
+	if(getenv("FREQ_TIME"))
+		freq_time_ms = atoi(getenv("FREQ_TIME"));
+
 	sprintf(buffer, "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", f->cpu);
 	fr = fopen(buffer, "r");
 
 	sprintf(buffer, "%s%s.%d.freq", log_dir, workload_name[f->type], f->cpu);
 	fw = fopen(buffer, "w");
-	
-	printf("buffer2 = %s\n\n", buffer);
 
 	fprintf(fw, "%lu\n", (unsigned long) time(NULL));
 	while(alive){
+		usleep((uint64_t) freq_time_ms * 1000);
+
 		read = fread(buffer, 1, BUFFER_SIZE - 1, fr);
 		buffer[read] = '\0';
+
 		fseek(fr, 0, SEEK_SET);
 		fwrite(buffer, 1, read, fw);
-		usleep((uint64_t) freq_time_ms * 1000);
 	}
 
 	fclose(fr);
