@@ -186,6 +186,31 @@ void map_random(){
 	free(app_aux);
 }
 
+void map_gomp(){
+	uint32_t i;
+	char *str;
+
+	if(getenv("GOMP_CPU_AFFINITY")){
+		str = strtok(getenv("GOMP_CPU_AFFINITY"),",");
+		threads[0].cpu = atoi(str);
+
+		for(i = 1; i < nt_exec; i++){
+			str = strtok(NULL, ",");
+			if(str){
+				threads[i].cpu = atoi(str);
+			}
+			else{
+				fprintf(stderr, "Less CPUs in GOMP_CPU_AFFINITY than workloads!\n");
+				exit(EXIT_FAILURE);
+			}
+		}
+	}
+	else{
+		fprintf(stderr, "GOMP_CPU_AFFINITY is not defined!\n");
+		exit(EXIT_FAILURE);
+	}
+}
+
 void thread_init(){
 	uint32_t i;
 
@@ -225,6 +250,9 @@ void map_env(char *mapping){
 	}else if(mapping[0] == 'o' && mapping[1] == 's'){
 		strcpy(map, "os");
 		os_enabled = 1;
+	}else if(mapping[0] == 'g' && mapping[1] == 'o'){
+		strcpy(map, "gomp");
+		map_gomp();
 	}else{
 		strcpy(map, "rand");
 		map_random();

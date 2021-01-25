@@ -22,6 +22,8 @@
 
 	void map_random();
 
+	void map_gomp();
+
 	void map_env(char *mapping);
 
 #endif

@@ -20,6 +20,7 @@
 volatile int alive = 1;
 thread_data_t *threads = NULL;
 uint32_t nt = 0, nt_exec = 0, freq_time_ms = 1;
+extern uint32_t freq_enabled;
 extern uint32_t papi_enabled;
 extern uint32_t os_enabled;
 extern char log_dir[2 * BUFFER_SIZE];
@@ -115,10 +116,12 @@ void *pthreads_callback (void *data){
 
 
 	pthread_t thread_freq;
-	freq_thread_data_t f;
-	f.cpu = t->cpu;
-	f.type = t->typeA;
-	pthread_create(&thread_freq, NULL, freq_monitor, (void *) &f);
+	if(freq_enabled){
+		freq_thread_data_t f;
+		f.cpu = t->cpu;
+		f.type = t->typeA;
+		pthread_create(&thread_freq, NULL, freq_monitor, (void *) &f);
+	}
 
 	double start = get_time();
 
@@ -127,7 +130,8 @@ void *pthreads_callback (void *data){
 	double end = get_time();
 	t->time = end - start;
 
-	pthread_join(thread_freq, NULL);
+	if(freq_enabled)
+		pthread_join(thread_freq, NULL);
 
 	if(papi_enabled && t->typeA != WORKLOAD_IDLE)
 		papi_thread_finish(t);

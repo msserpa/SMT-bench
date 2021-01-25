@@ -13,6 +13,7 @@
 #include "../include/libmapping.h"
 
 char log_dir[2 * BUFFER_SIZE];
+uint32_t freq_enabled = 0;
 uint32_t papi_enabled = 0;
 uint32_t os_enabled = 0;
 extern thread_data_t *threads;
@@ -87,7 +88,7 @@ int main(int argc, char **argv){
 	if(argc != 4){
 		uint64_t line_breaks[] = {4, 10, 13, 16, 19, 21, 22, 24, 25, 28, 31, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 65, 0};
 
-		fprintf(stderr, "Usage: %s <workloads-comma-separed> <os | heterogeneous | homogeneos | random> <time_in_seconds>\n", argv[0]);
+		fprintf(stderr, "Usage: %s <workloads-comma-separed> <os | heterogeneous | homogeneos | random | gomp> <time_in_seconds>\n", argv[0]);
 		fprintf(stderr, "Workloads list:\n\t");
 
 		j = 0;
@@ -116,8 +117,17 @@ int main(int argc, char **argv){
 		printf("nt=%d nt_exec=%d time_in_seconds=%ld\n", nt, nt_exec, atol(argv[3]));
 	}
 	else{
-		printf("missing OMP_NUM_THREADS\n");
+		printf("OMP_NUM_THREADS is not defined!\n");
 		exit(1);
+	}
+
+	if(getenv("FREQ_TIME") == NULL){
+		freq_enabled = 0;
+		printf("\nCPUFreq: disabled\n");
+	}else{
+		freq_enabled = 1;
+		printf("\nCPUFreq: enabled\n");
+		printf(" Sample: %sms\n", getenv("FREQ_TIME"));
 	}
 
 	if(getenv("PAPI_EVENT") == NULL){
@@ -125,7 +135,8 @@ int main(int argc, char **argv){
 		printf("PAPI: disabled\n\n");
 	}else{
 		papi_enabled = 1;
-		printf("PAPI: enabled\n\n");
+		printf("PAPI: enabled\n");
+		printf(" Events: %s\n\n", getenv("PAPI_EVENT"));
 	}
 
 	init_workload();
