@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include "../include/workloads.h"
@@ -128,6 +129,11 @@ int main(int argc, char **argv){
 		freq_enabled = 1;
 		printf("\nCPUFreq: enabled\n");
 		printf(" Sample: %sms\n", getenv("FREQ_TIME"));
+
+		if(getuid() != 0){
+			fprintf(stderr, "You must have root privileges to enable this feature!\n");
+			exit(EXIT_FAILURE);
+		}		
 	}
 
 	if(getenv("PAPI_EVENT") == NULL){

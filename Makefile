@@ -1,5 +1,5 @@
 SHELL=/bin/bash
-CC := gcc -fopenmp
+CC := gcc-10.2 -fopenmp
 HOST := $(shell hostname)
 TARGET := bin/mixed.$(HOST).x
 
