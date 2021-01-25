@@ -7,6 +7,7 @@
 #include <omp.h>
 #include <unistd.h>
 
+void (*work[NWORKLOADS]) (thread_data_t *t);
 extern thread_data_t *threads;
 extern uint32_t nt, nt_exec;
 extern int alive;

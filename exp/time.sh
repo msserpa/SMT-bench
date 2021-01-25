@@ -2,6 +2,9 @@
 
 #set -o errexit -o nounset -o pipefail -o posix
 
+date +"%d/%m/%Y %H:%M:%S"
+printf "\t Activating Intel Turbo Boost and Ondemand governor \n\n"
+
 $SCRATCH/governor/utils --ondemand
 $SCRATCH/governor/utils --turbo-on
 
@@ -19,7 +22,6 @@ exec=/tmp/$exec
 sed 's/^/\t/' /tmp/time.make
 printf "\n"
 
-exit
 mkdir -p output/
 while true; do
 	step=`ls output/ | grep $host | tail -1 | awk -F. {'print $2'}`
@@ -50,25 +52,26 @@ while true; do
 		date +"%d/%m/%Y %H:%M:%S"
 		printf "\t Warm-up\n"
 		stress-ng --cpu 100 -t 3 &> /tmp/time.stress
-		sed 's/^/\t/' /tmp/time.stress
+		sed 's/^/\t  /' /tmp/time.stress
 		printf "\n"
 		sleep 2
-
-		grepA=`echo $appA | awk -F: '{printf "%s", $1} NF > 1{printf "-%sKB", $2} {printf ":"}'`
-		grepB=`echo $appB | awk -F: '{printf "%s", $1} NF > 1{printf "-%sKB", $2} {printf ":"}'`
-		
+	
 		date +"%d/%m/%Y %H:%M:%S"
 		printf "\t Mapping: $mapping \n"
 		printf "\t Threads: $thread \n"
 		printf "\t Application A: $appA \n"
 		printf "\t Application B: $appB \n\n"
-		OMP_NUM_THREADS=thread $exec $appA,$appB $mapping 30 1> /tmp/micro.time.out 2> /tmp/micro.time.err
+		OMP_NUM_THREADS=$thread $exec $appA,$appB $mapping 30 1> /tmp/micro.time.out 2> /tmp/micro.time.err
 		
-		perfAmin=`cat /tmp/micro.time.err | grep $grepA\min | awk -F: {'printf "%f", $3'}`
-		perfAmax=`cat /tmp/micro.time.err | grep $grepA\max | awk -F: {'printf "%f", $3'}`
-		perfAavg=`cat /tmp/micro.time.err | grep $grepA\avg | awk -F: {'printf "%f", $3'}`
+		perfAmin=`cat /tmp/micro.time.err | grep min | awk {'print $7'} | head -n1`
+		perfAmax=`cat /tmp/micro.time.err | grep max | awk {'print $7'} | head -n1`
+		perfAavg=`cat /tmp/micro.time.err | grep avg | awk {'print $7'} | head -n1`
 
-		echo $host,$arch,$thread,$mapping,$appA,$appB,$perfAmin,$perfAmax,$perfAavg >> $output
+		perfBmin=`cat /tmp/micro.time.err | grep min | awk {'print $7'} | tail -n1`
+		perfBmax=`cat /tmp/micro.time.err | grep max | awk {'print $7'} | tail -n1`
+		perfBavg=`cat /tmp/micro.time.err | grep avg | awk {'print $7'} | tail -n1`		
+
+		echo $host,$arch,$thread,$mapping,$appA,$appB,$perfAmin,$perfAavg,$perfAmax,$perfBmin,$perfBavg,$perfBmax >> $output
 
 		sed -i '1d' $doe
         find $DOE -size 0 -delete

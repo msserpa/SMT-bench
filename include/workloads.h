@@ -183,7 +183,7 @@
 		uint32_t cpu;
 	}  __attribute__ ((aligned (CACHE_LINE_SIZE))) freq_thread_data_t;
 
-	void (*work[NWORKLOADS]) (thread_data_t *t);
+	extern void (*work[NWORKLOADS]) (thread_data_t *t);
 	void init_workload();
 	void control_complex(thread_data_t *t);
 	void control_conditional(thread_data_t *t);
