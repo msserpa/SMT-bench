@@ -12,7 +12,7 @@
 #include "../include/mypapi.h"
 #include "../include/libmapping.h"
 
-char log_dir[BUFFER_SIZE];
+char log_dir[2 * BUFFER_SIZE];
 uint32_t papi_enabled = 0;
 uint32_t os_enabled = 0;
 extern thread_data_t *threads;
@@ -46,11 +46,22 @@ int main(int argc, char **argv){
 
 	struct stat st = {0};
 
-	sprintf(log_dir, "./log/%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+	char buffer[BUFFER_SIZE];
+
+	sprintf(log_dir, "./log/");
+	
 	if(stat(log_dir, &st) == -1)
     	mkdir(log_dir, 0700);
 
-	sprintf(log_dir, "%s/%02d-%02d-%02d/",log_dir, tm.tm_hour, tm.tm_min, tm.tm_sec);
+	sprintf(buffer, "%04d-%02d-%02d/", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+	strcat(log_dir, buffer);
+	
+	if(stat(log_dir, &st) == -1)
+    	mkdir(log_dir, 0700);
+
+	sprintf(buffer, "%02d-%02d-%02d/", tm.tm_hour, tm.tm_min, tm.tm_sec);
+	strcat(log_dir, buffer);
+	
 	if(stat(log_dir, &st) == -1)
     	mkdir(log_dir, 0700);
 

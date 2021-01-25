@@ -22,21 +22,23 @@ thread_data_t *threads = NULL;
 uint32_t nt = 0, nt_exec = 0, freq_time_ms = 1;
 extern uint32_t papi_enabled;
 extern uint32_t os_enabled;
-extern char log_dir[BUFFER_SIZE];
+extern char log_dir[2 * BUFFER_SIZE];
 
 void *freq_monitor(void *data){
 	printf("freq monitor!\n");
 	freq_thread_data_t *f = (freq_thread_data_t *) data;
-	char buffer[BUFFER_SIZE];
+	char buffer[3 * BUFFER_SIZE];
 	size_t read;
 	FILE *fr, *fw;
 
 	sprintf(buffer, "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq", f->cpu);
 	fr = fopen(buffer, "r");
 
-	sprintf(buffer, "%s/%s.%d.freq", log_dir, workload_name[f->type], f->cpu);
+	sprintf(buffer, "%s%s.%d.freq", log_dir, workload_name[f->type], f->cpu);
 	fw = fopen(buffer, "w");
 	
+	printf("buffer2 = %s\n\n", buffer);
+
 	fprintf(fw, "%lu\n", (unsigned long) time(NULL));
 	while(alive){
 		read = fread(buffer, 1, BUFFER_SIZE - 1, fr);
